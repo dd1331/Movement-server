@@ -36,4 +36,14 @@ describe('UsersService', () => {
     await service.findOne(3);
     expect(User.findOne).toHaveBeenCalledWith(3);
   });
+
+  describe('create', () => {
+    it('should have create function', () => {
+      expect(service.create).toBeDefined();
+      expect(typeof service.create).toBe('function');
+    });
+    // it('should create user', () => {
+
+    // });
+  });
 });
