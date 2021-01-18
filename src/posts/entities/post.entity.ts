@@ -1,6 +1,13 @@
-import { CommonEntity } from 'src/common.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { CommonEntity } from '../../common.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -16,8 +23,8 @@ export class Post extends CommonEntity {
   @Column()
   content: string;
 
-  @Column()
-  comment: string; //temp
+  @OneToMany((type) => Comment, (comment) => comment.postId)
+  comments: string;
 
   @Column()
   like: number;

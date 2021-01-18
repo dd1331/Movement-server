@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { CommonEntity } from 'src/common.entity';
-import { User } from 'src/users/entities/user.entity';
+import { CommonEntity } from '../../common.entity';
+import { User } from '../../users/entities/user.entity';
+import { Post } from '../../posts/entities/post.entity';
 
 @Entity()
 export class Comment extends CommonEntity {
@@ -18,4 +19,7 @@ export class Comment extends CommonEntity {
 
   @Column()
   dislike: number;
+
+  @ManyToOne((type) => Post, (post) => post.comments)
+  postId: string;
 }

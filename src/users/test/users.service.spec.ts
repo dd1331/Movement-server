@@ -3,6 +3,7 @@ import { UsersService } from '../users.service';
 import { User } from '../entities/user.entity';
 import { HttpStatus } from '@nestjs/common';
 User.findOne = jest.fn();
+User.create = jest.fn();
 describe('UsersService', () => {
   let service: UsersService;
 
@@ -25,13 +26,12 @@ describe('UsersService', () => {
     expect(User.findOne).toHaveBeenCalledWith(3);
   });
   it('should throw error', async () => {
-    (User.findOne as jest.Mock).mockReturnValue(null);
+    // (User.findOne as jest.Mock).mockReturnValue(null);
     const { response } = await service.findOne(-3);
     expect(response.status).toBe(HttpStatus.NOT_FOUND);
     expect(response.error).toBe('user not found');
   });
   test('findOne function should be defined', async () => {
-    User.findOne = jest.fn();
     expect(typeof service.findOne).toBe('function');
     await service.findOne(3);
     expect(User.findOne).toHaveBeenCalledWith(3);
@@ -42,8 +42,46 @@ describe('UsersService', () => {
       expect(service.create).toBeDefined();
       expect(typeof service.create).toBe('function');
     });
-    // it('should create user', () => {
-
-    // });
+    const newUser = {
+      name: 'test',
+      password: '123123',
+      phone: '01000000000',
+    };
+    it('should be called with newUser', async () => {
+      await service.create(newUser);
+      expect(User.create).toHaveBeenCalledWith(newUser);
+    });
+    it('should return true if newUser is created', async () => {
+      (User.create as jest.Mock).mockReturnValue(newUser);
+      const response = await service.create(newUser);
+      expect(response).toStrictEqual(newUser);
+    });
+    it('should throw an error if phone exist', async () => {
+      (User.create as jest.Mock).mockReturnValue(new Error());
+      const response = await service.create(newUser);
+      expect(response);
+    });
+    it('should return an error if name exist', async () => {
+      (User.findOne as jest.Mock).mockReturnValue(newUser);
+      const { response } = await service.checkDuplication(newUser.name);
+      expect(response.status).toBe(HttpStatus.CONFLICT);
+      expect(response.error).toBe('이미 존재하는 **입니다');
+    });
+    it('should return an error if phone exist', async () => {
+      (User.findOne as jest.Mock).mockReturnValue(newUser);
+      const { response } = await service.checkDuplication(newUser.phone);
+      expect(response.status).toBe(HttpStatus.CONFLICT);
+      expect(response.error).toBe('이미 존재하는 **입니다');
+    });
+    it('should return true if name does not exist', async () => {
+      (User.findOne as jest.Mock).mockReturnValue(null);
+      const { response } = await service.checkDuplication(newUser.name);
+      expect(response).toBeTruthy;
+    });
+    it('should return true if phone does not exist', async () => {
+      (User.findOne as jest.Mock).mockReturnValue(null);
+      const { response } = await service.checkDuplication(newUser.phone);
+      expect(response).toBeTruthy;
+    });
   });
 });

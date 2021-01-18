@@ -5,9 +5,9 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
-import { CommonEntity } from 'src/common.entity';
-import { Post } from 'src/posts/entities/post.entity';
-import { Comment } from 'src/comments/entities/comments.entity';
+import { CommonEntity } from '../../common.entity';
+import { Post } from '../../posts/entities/post.entity';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity()
 export class User extends CommonEntity {

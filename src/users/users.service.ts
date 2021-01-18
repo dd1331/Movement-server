@@ -5,9 +5,30 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  async create(createUserDto: CreateUserDto) {
-    await User.create(createUserDto);
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      const newUser = await User.create(createUserDto);
+      return newUser;
+    } catch (error) {
+      return error;
+    }
+  }
+  //temp any
+  async checkDuplication(payload): Promise<any | boolean> {
+    const findOption = { where: payload };
+
+    const isDuplicated = await User.findOne(findOption);
+
+    if (isDuplicated) {
+      return new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          error: '이미 존재하는 **입니다',
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+    return true;
   }
 
   findAll() {
