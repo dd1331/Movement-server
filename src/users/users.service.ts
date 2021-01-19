@@ -2,12 +2,17 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+  ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const newUser = await User.create(createUserDto);
+      const newUser = await this.userRepo.create(createUserDto);
       return newUser;
     } catch (error) {
       return error;
@@ -17,8 +22,7 @@ export class UsersService {
   async checkDuplication(payload): Promise<any | boolean> {
     const findOption = { where: payload };
 
-    const isDuplicated = await User.findOne(findOption);
-
+    const isDuplicated = await this.userRepo.findOne(findOption);
     if (isDuplicated) {
       return new HttpException(
         {
@@ -37,7 +41,7 @@ export class UsersService {
 
   async findOne(id: number) {
     try {
-      const user = await User.findOne(id);
+      const user = await this.userRepo.findOne(id);
 
       if (!user) {
         throw new HttpException(
