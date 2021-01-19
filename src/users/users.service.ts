@@ -12,29 +12,37 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      this.checkDuplication(createUserDto.name);
-      this.checkDuplication(createUserDto.phone);
+      await this.checkDuplication(createUserDto.name, 'name');
+      await this.checkDuplication(createUserDto.phone, 'phone');
       const newUser = await this.userRepo.create(createUserDto);
+      await this.userRepo.save(newUser);
       return newUser;
     } catch (error) {
       return error;
     }
   }
   //temp any
-  async checkDuplication(payload): Promise<any | boolean> {
-    const findOption = { where: payload };
+  async checkDuplication(payload, type): Promise<any | boolean> {
+    try {
+      const findOption = {};
+      findOption[type] = payload;
 
-    const isDuplicated = await this.userRepo.findOne(findOption);
-    if (isDuplicated) {
-      return new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          error: '이미 존재하는 **입니다',
-        },
-        HttpStatus.CONFLICT,
-      );
+      const isDuplicated = await this.userRepo.findOne({
+        where: { ...findOption },
+      });
+      if (isDuplicated) {
+        throw new HttpException(
+          {
+            status: HttpStatus.CONFLICT,
+            error: '이미 존재하는 **입니다',
+          },
+          HttpStatus.CONFLICT,
+        );
+      }
+      return true;
+    } catch (error) {
+      return error;
     }
-    return true;
   }
 
   async findAll() {

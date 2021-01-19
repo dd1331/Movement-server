@@ -20,7 +20,7 @@ export class User extends CommonEntity {
   @Column()
   password: string;
 
-  @Column()
+  @PrimaryColumn()
   phone: string;
 
   @OneToMany((type) => Post, (post) => post.userId)

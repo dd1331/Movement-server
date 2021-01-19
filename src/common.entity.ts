@@ -3,7 +3,7 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  Column,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -14,7 +14,6 @@ export class CommonEntity extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
   updatedAt: Date;
 
-  // @Column({ name: 'deleted_at', type: 'datetime' })
-  @Column() // 이렇게 하면?
+  @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', nullable: true })
   deletedAt: Date;
 }

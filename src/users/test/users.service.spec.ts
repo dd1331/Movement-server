@@ -85,39 +85,53 @@ describe('UsersService', () => {
     });
 
     it('should be called with newUserPayload', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(null);
       await service.create(newUsers[0]);
       expect(repo.create).toHaveBeenCalledWith(newUsers[0]);
     });
     it('should return true if newUserPayload is created', async () => {
-      (User.create as jest.Mock).mockReturnValue(newUsers[0]);
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      (repo.create as jest.Mock).mockReturnValue(newUsers[0]);
       const response = await service.create(newUsers[0]);
       expect(response).toStrictEqual(newUsers[0]);
     });
     it('should throw an error if phone exist', async () => {
-      (User.create as jest.Mock).mockReturnValue(new Error());
+      (repo.create as jest.Mock).mockReturnValue(new Error());
       const response = await service.create(newUsers[0]);
       expect(response);
     });
     it('should return an error if name exist', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
-      const { response } = await service.checkDuplication(newUsers[0].name);
+      const { response } = await service.checkDuplication(
+        newUsers[0].name,
+        'name',
+      );
       expect(response.status).toBe(HttpStatus.CONFLICT);
       expect(response.error).toBe('이미 존재하는 **입니다');
     });
     it('should return an error if phone exist', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
-      const { response } = await service.checkDuplication(newUsers[0].phone);
+      const { response } = await service.checkDuplication(
+        newUsers[0].phone,
+        'phone',
+      );
       expect(response.status).toBe(HttpStatus.CONFLICT);
       expect(response.error).toBe('이미 존재하는 **입니다');
     });
     it('should return true if name does not exist', async () => {
-      (User.findOne as jest.Mock).mockReturnValue(null);
-      const { response } = await service.checkDuplication(newUsers[0].name);
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      const { response } = await service.checkDuplication(
+        newUsers[0].name,
+        'name',
+      );
       expect(response).toBeTruthy;
     });
     it('should return true if phone does not exist', async () => {
-      (User.findOne as jest.Mock).mockReturnValue(null);
-      const { response } = await service.checkDuplication(newUsers[0].phone);
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      const { response } = await service.checkDuplication(
+        newUsers[0].phone,
+        'phone',
+      );
       expect(response).toBeTruthy;
     });
   });
