@@ -4,13 +4,26 @@ import { User } from '../entities/user.entity';
 import { HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-User.findOne = jest.fn();
-User.create = jest.fn();
-const newUser = {
-  name: 'test',
-  password: '123123',
-  phone: '01000000000',
-};
+const newUsers = [
+  {
+    id: 0,
+    name: 'test',
+    password: '123123',
+    phone: '01000000000',
+  },
+  {
+    id: 1,
+    name: 'test1',
+    password: '123123',
+    phone: '01000000001',
+  },
+  {
+    id: 2,
+    name: 'test2',
+    password: '123123',
+    phone: '01000000002',
+  },
+];
 describe('UsersService', () => {
   let service: UsersService;
   let repo: Repository<User>;
@@ -23,9 +36,9 @@ describe('UsersService', () => {
           provide: getRepositoryToken(User),
 
           useValue: {
-            find: jest.fn().mockResolvedValue('catArray'),
+            find: jest.fn().mockResolvedValue(newUsers),
             findOneOrFail: jest.fn().mockResolvedValue('oneCat'),
-            create: jest.fn().mockReturnValue(newUser),
+            create: jest.fn().mockReturnValue(newUsers[0]),
             save: jest.fn(),
             // as these do not actually use their return values in our sample
             // we just make sure that their resolee is true to not crash
@@ -34,7 +47,7 @@ describe('UsersService', () => {
             // we just make sure that their resolee is true to not crash
             delete: jest.fn().mockResolvedValue(true),
             // findOne: jest.fn().mockResolvedValue(true),
-            findOne: jest.fn(),
+            findOne: jest.fn().mockReturnValue(newUsers[0]),
           },
         },
       ],
@@ -54,7 +67,7 @@ describe('UsersService', () => {
     expect(repo.findOne).toHaveBeenCalledWith(3);
   });
   it('should throw error', async () => {
-    // (User.findOne as jest.Mock).mockReturnValue(null);
+    (repo.findOne as jest.Mock).mockReturnValue(null);
     const { response } = await service.findOne(-3);
     expect(response.status).toBe(HttpStatus.NOT_FOUND);
     expect(response.error).toBe('user not found');
@@ -71,41 +84,72 @@ describe('UsersService', () => {
       expect(typeof service.create).toBe('function');
     });
 
-    it('should be called with newUser', async () => {
-      await service.create(newUser);
-      expect(repo.create).toHaveBeenCalledWith(newUser);
+    it('should be called with newUserPayload', async () => {
+      await service.create(newUsers[0]);
+      expect(repo.create).toHaveBeenCalledWith(newUsers[0]);
     });
-    it('should return true if newUser is created', async () => {
-      (User.create as jest.Mock).mockReturnValue(newUser);
-      const response = await service.create(newUser);
-      expect(response).toStrictEqual(newUser);
+    it('should return true if newUserPayload is created', async () => {
+      (User.create as jest.Mock).mockReturnValue(newUsers[0]);
+      const response = await service.create(newUsers[0]);
+      expect(response).toStrictEqual(newUsers[0]);
     });
     it('should throw an error if phone exist', async () => {
       (User.create as jest.Mock).mockReturnValue(new Error());
-      const response = await service.create(newUser);
+      const response = await service.create(newUsers[0]);
       expect(response);
     });
     it('should return an error if name exist', async () => {
-      (repo.findOne as jest.Mock).mockReturnValue(newUser);
-      const { response } = await service.checkDuplication(newUser.name);
+      (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
+      const { response } = await service.checkDuplication(newUsers[0].name);
       expect(response.status).toBe(HttpStatus.CONFLICT);
       expect(response.error).toBe('이미 존재하는 **입니다');
     });
     it('should return an error if phone exist', async () => {
-      (repo.findOne as jest.Mock).mockReturnValue(newUser);
-      const { response } = await service.checkDuplication(newUser.phone);
+      (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
+      const { response } = await service.checkDuplication(newUsers[0].phone);
       expect(response.status).toBe(HttpStatus.CONFLICT);
       expect(response.error).toBe('이미 존재하는 **입니다');
     });
     it('should return true if name does not exist', async () => {
       (User.findOne as jest.Mock).mockReturnValue(null);
-      const { response } = await service.checkDuplication(newUser.name);
+      const { response } = await service.checkDuplication(newUsers[0].name);
       expect(response).toBeTruthy;
     });
     it('should return true if phone does not exist', async () => {
       (User.findOne as jest.Mock).mockReturnValue(null);
-      const { response } = await service.checkDuplication(newUser.phone);
+      const { response } = await service.checkDuplication(newUsers[0].phone);
       expect(response).toBeTruthy;
+    });
+  });
+
+  describe('read', () => {
+    it('findOne function should be defined', async () => {
+      expect(service.findOne).toBeDefined;
+      expect(typeof service.findOne).toBe('function');
+    });
+    it('findOne should be called with int', async () => {
+      const id = 5;
+      await service.findOne(id);
+      expect(repo.findOne).toHaveBeenCalledWith(id);
+    });
+    it('should throw an error when user does not exist', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      const { response } = await service.findOne(-5);
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.error).toBe('user not found');
+    });
+    it('should return a user if user exists', async () => {
+      const user = await service.create(newUsers[0]);
+      const response = await service.findOne(user.id);
+      expect(response).toStrictEqual(newUsers[0]);
+    });
+
+    it('should return all users', async () => {
+      await service.create(newUsers[0]);
+      await service.create(newUsers[1]);
+      await service.create(newUsers[2]);
+      const response = await service.findAll();
+      expect(response).toStrictEqual(newUsers);
     });
   });
 });

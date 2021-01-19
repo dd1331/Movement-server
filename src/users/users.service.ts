@@ -12,6 +12,8 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
+      this.checkDuplication(createUserDto.name);
+      this.checkDuplication(createUserDto.phone);
       const newUser = await this.userRepo.create(createUserDto);
       return newUser;
     } catch (error) {
@@ -35,8 +37,9 @@ export class UsersService {
     return true;
   }
 
-  findAll() {
-    return [`This action returns all users`];
+  async findAll() {
+    const users = await this.userRepo.find();
+    return users;
   }
 
   async findOne(id: number) {

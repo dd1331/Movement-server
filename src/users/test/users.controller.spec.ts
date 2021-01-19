@@ -27,7 +27,7 @@ describe('UsersController', () => {
     test('createUser return', () => {
       // User.crea
       User.create = jest.fn();
-      service.create({ name: 'test' });
+      // service.create({ name: 'test' });
       expect(User.create).toBeCalled();
 
       // jest.spyOn(service, '')
