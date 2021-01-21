@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../common.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
@@ -14,13 +8,12 @@ export class User extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn()
+  @Column({ unique: true })
   name: string;
 
   @Column()
   password: string;
-
-  @PrimaryColumn()
+  @Column({ unique: true })
   phone: string;
 
   @OneToMany((type) => Post, (post) => post.userId)

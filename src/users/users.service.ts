@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -12,37 +12,29 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      await this.checkDuplication(createUserDto.name, 'name');
-      await this.checkDuplication(createUserDto.phone, 'phone');
+      await this.checkIfExist(createUserDto);
       const newUser = await this.userRepo.create(createUserDto);
-      await this.userRepo.save(newUser);
       return newUser;
     } catch (error) {
       return error;
     }
   }
   //temp any
-  async checkDuplication(payload, type): Promise<any | boolean> {
-    try {
-      const findOption = {};
-      findOption[type] = payload;
+  async checkIfExist(createUserDto: CreateUserDto): Promise<boolean> {
+    const { phone, name } = createUserDto;
+    const where = [{ phone }, { name }];
 
-      const isDuplicated = await this.userRepo.findOne({
-        where: { ...findOption },
-      });
-      if (isDuplicated) {
-        throw new HttpException(
-          {
-            status: HttpStatus.CONFLICT,
-            error: '이미 존재하는 **입니다',
-          },
-          HttpStatus.CONFLICT,
-        );
-      }
-      return true;
-    } catch (error) {
-      return error;
+    const isExist = await this.userRepo.findOne({ where });
+    if (isExist) {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          error: '이미 존재하는 **입니다',
+        },
+        HttpStatus.CONFLICT,
+      );
     }
+    return true;
   }
 
   async findAll() {
@@ -52,8 +44,9 @@ export class UsersService {
 
   async findOne(id: number) {
     try {
-      const user = await this.userRepo.findOne(id);
-
+      const user = await this.userRepo.findOne({
+        where: { id, deletedAt: IsNull() },
+      });
       if (!user) {
         throw new HttpException(
           {
@@ -74,7 +67,24 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<boolean> {
+    // const user = await this.userRepo.findOne(id);
+    try {
+      const user = await this.userRepo.findOne(id);
+      if (!user) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'user not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      const result = await this.userRepo.softDelete(id);
+      if (result) return true;
+      return false;
+    } catch (error) {
+      return error;
+    }
   }
 }

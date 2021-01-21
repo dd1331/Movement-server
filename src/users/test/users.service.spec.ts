@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../users.service';
 import { User } from '../entities/user.entity';
 import { HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 const newUsers = [
   {
@@ -48,6 +48,7 @@ describe('UsersService', () => {
             delete: jest.fn().mockResolvedValue(true),
             // findOne: jest.fn().mockResolvedValue(true),
             findOne: jest.fn().mockReturnValue(newUsers[0]),
+            softDelete: jest.fn(),
           },
         },
       ],
@@ -64,7 +65,9 @@ describe('UsersService', () => {
   });
   it('should be called width id', async () => {
     await service.findOne(3);
-    expect(repo.findOne).toHaveBeenCalledWith(3);
+    expect(repo.findOne).toHaveBeenCalledWith({
+      where: { id: 3, deletedAt: IsNull() },
+    });
   });
   it('should throw error', async () => {
     (repo.findOne as jest.Mock).mockReturnValue(null);
@@ -75,7 +78,9 @@ describe('UsersService', () => {
   test('findOne function should be defined', async () => {
     expect(typeof service.findOne).toBe('function');
     await service.findOne(3);
-    expect(repo.findOne).toHaveBeenCalledWith(3);
+    expect(repo.findOne).toHaveBeenCalledWith({
+      where: { id: 3, deletedAt: IsNull() },
+    });
   });
 
   describe('create', () => {
@@ -100,38 +105,33 @@ describe('UsersService', () => {
       const response = await service.create(newUsers[0]);
       expect(response);
     });
-    it('should return an error if name exist', async () => {
-      (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
-      const { response } = await service.checkDuplication(
-        newUsers[0].name,
-        'name',
-      );
-      expect(response.status).toBe(HttpStatus.CONFLICT);
-      expect(response.error).toBe('이미 존재하는 **입니다');
-    });
+    // it('returns true if name exist', async () => {
+    //   (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
+    //   const response = await service.checkIfExist(newUsers[0]);
+    //   expect(response).toBeTruthy;
+    //   // expect(response.status).toBe(HttpStatus.CONFLICT);
+    //   // expect(response.error).toBe('이미 존재하는 **입니다');
+    // });
     it('should return an error if phone exist', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
-      const { response } = await service.checkDuplication(
-        newUsers[0].phone,
-        'phone',
-      );
-      expect(response.status).toBe(HttpStatus.CONFLICT);
-      expect(response.error).toBe('이미 존재하는 **입니다');
+      try {
+        await service.checkIfExist(newUsers[0]);
+      } catch (error) {
+        expect(error.response).toEqual({
+          status: HttpStatus.CONFLICT,
+          error: '이미 존재하는 **입니다',
+        });
+      }
+      // expect(response.error).toBe('이미 존재하는 **입니다');
     });
     it('should return true if name does not exist', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(null);
-      const { response } = await service.checkDuplication(
-        newUsers[0].name,
-        'name',
-      );
+      const response = await service.checkIfExist(newUsers[0]);
       expect(response).toBeTruthy;
     });
     it('should return true if phone does not exist', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(null);
-      const { response } = await service.checkDuplication(
-        newUsers[0].phone,
-        'phone',
-      );
+      const response = await service.checkIfExist(newUsers[0]);
       expect(response).toBeTruthy;
     });
   });
@@ -144,7 +144,9 @@ describe('UsersService', () => {
     it('findOne should be called with int', async () => {
       const id = 5;
       await service.findOne(id);
-      expect(repo.findOne).toHaveBeenCalledWith(id);
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id, deletedAt: IsNull() },
+      });
     });
     it('should throw an error when user does not exist', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(null);
@@ -164,6 +166,19 @@ describe('UsersService', () => {
       await service.create(newUsers[2]);
       const response = await service.findAll();
       expect(response).toStrictEqual(newUsers);
+    });
+  });
+  describe('DELETE', () => {
+    it('return false if user does not exist', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      const response = await service.remove(-3);
+      expect(response).toBeFalsy;
+    });
+    it('softdelete and return true if user exist', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(newUsers[0]);
+      (repo.softDelete as jest.Mock).mockReturnValue(newUsers[0]);
+      const response = await service.remove(0);
+      expect(response).toBeTruthy;
     });
   });
 });

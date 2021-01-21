@@ -1,7 +1,5 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, HttpStatus } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { UsersModule } from '../users.module';
-import { UsersService } from '../users.service';
 import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 const newUsers = [
@@ -32,15 +30,16 @@ describe('Users', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      // .overrideProvider(UsersService)
-      // .useValue(usersService)
-      .compile();
+    }).compile();
 
     app = moduleRef.createNestApplication();
     await app.init();
   });
+  afterAll(async () => {
+    await app.close();
+  });
   it('/POST signup', async () => {
+    // const res = await request(app.getHttpServer()).delete('/users/' + 1);
     const response = await request(app.getHttpServer())
       .post('/users/signup')
       .send(newUsers[0])
@@ -48,13 +47,17 @@ describe('Users', () => {
     console.log(response.body);
     expect(response.body).toEqual({});
   });
-  it('/GET users', () => {
-    return request(app.getHttpServer()).get('/users').expect(200).expect({
+  it('/GET users', async () => {
+    return await request(app.getHttpServer()).get('/users').expect(200).expect({
       data: usersService.findAll(),
     });
   });
-
-  afterAll(async () => {
-    await app.close();
+  it('/DELETE delete user', async () => {
+    const userId = 3;
+    const response = await request(app.getHttpServer()).delete(
+      '/users/' + userId,
+    );
+    //.send(); // 필요???
+    console.log('response', response.body);
   });
 });
