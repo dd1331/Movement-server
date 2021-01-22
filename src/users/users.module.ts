@@ -8,6 +8,7 @@ import { User } from './entities/user.entity';
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
   // exports: [CatsService] // shared module 다른 모듈에서 사용하기 위해서는 exports 해줘야함
 })
 export class UsersModule {}

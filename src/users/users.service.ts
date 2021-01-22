@@ -63,6 +63,24 @@ export class UsersService {
     }
   }
 
+  ///temp///
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
+  async findOneByName(name: string) {
+    return this.users.find((user) => user.username === name);
+  }
+  ///temp///
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
