@@ -6,10 +6,10 @@ import { Post } from '../../posts/entities/post.entity';
 @Entity()
 export class Comment extends CommonEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @ManyToOne((type) => User, (user) => user.comments)
-  userId: string;
+  commenter: number;
 
   @Column()
   content: string;

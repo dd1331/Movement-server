@@ -12,10 +12,10 @@ import { Comment } from '../../comments/entities/comment.entity';
 @Entity()
 export class Post extends CommonEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @ManyToOne((type) => User, (user) => user.posts)
-  userId: string;
+  poster: number;
 
   @Column()
   title: string;
@@ -23,15 +23,15 @@ export class Post extends CommonEntity {
   @Column()
   content: string;
 
-  @OneToMany((type) => Comment, (comment) => comment.postId)
-  comments: string;
-
-  @Column()
+  @Column({ nullable: true })
   like: number;
 
-  @Column()
+  @Column({ nullable: true })
   dislike: number;
 
-  @Column()
+  @Column({ nullable: true })
   views: number;
+
+  @OneToMany((type) => Comment, (comment) => comment.postId)
+  comments: string;
 }

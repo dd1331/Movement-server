@@ -53,8 +53,8 @@ describe('UsersService', () => {
         },
       ],
     }).compile();
-    repo = module.get<Repository<User>>(getRepositoryToken(User));
     service = module.get<UsersService>(UsersService);
+    repo = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   it('should be defined', () => {
