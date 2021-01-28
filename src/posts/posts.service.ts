@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository, UpdateResult, IsNull } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
@@ -18,7 +18,9 @@ export class PostsService {
     return newPost;
   }
   async readPost(id: number): Promise<Post> {
-    const post = await this.postRepo.findOne(id);
+    const post = await this.postRepo.findOne({
+      where: { id, deletedAt: IsNull() },
+    });
     if (!post)
       throw new HttpException(
         '존재하지 않는 게시글입니다',
@@ -27,7 +29,9 @@ export class PostsService {
     return post;
   }
   async readAllPosts(): Promise<Post[]> {
-    const posts = await this.postRepo.find();
+    const posts = await this.postRepo.find({
+      where: { deletedAt: IsNull() },
+    });
 
     return posts;
   }
@@ -41,9 +45,9 @@ export class PostsService {
     });
     return updatedPost;
   }
-  async deletePost(postId: number): Promise<Post | boolean> {
+  async deletePost(postId: number): Promise<Post> {
     const post = await this.readPost(postId);
-    if (!post) return false;
+    if (!post) return;
     await this.postRepo.softDelete(postId);
     return post;
   }

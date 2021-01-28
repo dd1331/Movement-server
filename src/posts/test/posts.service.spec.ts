@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PostsService } from './posts.service';
-import { Repository } from 'typeorm';
+import { PostsService } from '../posts.service';
+import { Repository, IsNull } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Post } from './entities/post.entity';
+import { Post } from '../entities/post.entity';
 import { HttpStatus } from '@nestjs/common';
 const newPosts = [
   {
@@ -13,6 +13,7 @@ const newPosts = [
     like: 0,
     dislike: 0,
     views: 0,
+    deletedAt: null,
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ const newPosts = [
     like: 0,
     dislike: 0,
     views: 0,
+    deletedAt: new Date(),
   },
   {
     id: 3,
@@ -31,6 +33,7 @@ const newPosts = [
     like: 0,
     dislike: 0,
     views: 0,
+    deletedAt: null,
   },
   {
     id: 4,
@@ -40,6 +43,7 @@ const newPosts = [
     like: 0,
     dislike: 0,
     views: 0,
+    deletedAt: null,
   },
 ];
 const createPostDto = {
@@ -127,7 +131,9 @@ describe('PostsService', () => {
         expect(error.message).toBe('존재하지 않는 게시글입니다');
       }
       expect(repo.findOne).toHaveBeenCalled();
-      expect(repo.findOne).toHaveBeenCalledWith(3);
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id: 3, deletedAt: IsNull() },
+      });
     });
     it('should throw an error if no data exist', async () => {
       (repo.find as jest.Mock).mockReturnValue(null);
@@ -138,6 +144,19 @@ describe('PostsService', () => {
         expect(error.message).toBe('존재하지 않는 게시글입니다');
       }
       expect(repo.find).toHaveBeenCalled();
+    });
+    it('should throw an error if it is a deleted post', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      try {
+        await service.readPost(newPosts[1].id);
+      } catch (error) {
+        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+        expect(error.message).toBe('존재하지 않는 게시글입니다');
+      }
+      expect(repo.findOne).toHaveBeenCalledTimes(1);
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id: newPosts[1].id, deletedAt: IsNull() },
+      });
     });
   });
   describe('UPDATE', () => {
@@ -171,6 +190,19 @@ describe('PostsService', () => {
       expect(repo.findOne).toBeCalled();
       expect(repo.update).toBeCalledTimes(0);
     });
+    it('should throw an error if it is a deleted post', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      try {
+        await service.updatePost(updateDto);
+      } catch (error) {
+        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+        expect(error.message).toBe('존재하지 않는 게시글입니다');
+      }
+      expect(repo.findOne).toBeCalledTimes(1);
+      expect(repo.findOne).toBeCalledWith({
+        where: { id: updateDto.postId, deletedAt: IsNull() },
+      });
+    });
   });
   describe('DELETE', () => {
     it('should be defined', () => {
@@ -182,13 +214,15 @@ describe('PostsService', () => {
       (repo.findOne as jest.Mock).mockReturnValue(null);
       (repo.softDelete as jest.Mock).mockReturnValue(null);
       try {
-        await service.deletePost(3);
+        await service.deletePost(postId);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe('존재하지 않는 게시글입니다');
       }
       expect(repo.findOne).toHaveBeenCalled();
-      expect(repo.findOne).toHaveBeenCalledWith(postId);
+      expect(repo.findOne).toHaveBeenCalledWith({
+        where: { id: postId, deletedAt: IsNull() },
+      });
       expect(repo.softDelete).toHaveBeenCalledTimes(0);
       // expect()
       // expect
@@ -200,6 +234,19 @@ describe('PostsService', () => {
       const res = await service.deletePost(postId);
       expect(repo.softDelete).toHaveBeenCalledWith(postId);
       expect(res).toStrictEqual(newPosts[0]);
+    });
+    it('should throw an error if post is already deleted', async () => {
+      (repo.findOne as jest.Mock).mockReturnValue(null);
+      try {
+        await service.deletePost(2);
+      } catch (error) {
+        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+        expect(error.message).toBe('존재하지 않는 게시글입니다');
+      }
+      expect(repo.findOne).toBeCalledTimes(1);
+      expect(repo.findOne).toBeCalledWith({
+        where: { id: 2, deletedAt: IsNull() },
+      });
     });
   });
 });
