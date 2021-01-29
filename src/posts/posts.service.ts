@@ -12,6 +12,7 @@ export class PostsService {
   ) {}
   async createPost(createPostDto: CreatePostDto): Promise<Post> {
     const newPost = await this.postRepo.create(createPostDto);
+    await this.postRepo.save(newPost);
     if (!newPost) {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
     }

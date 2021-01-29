@@ -21,6 +21,8 @@ import { PostsModule } from './posts/posts.module';
       database: 'movement',
       entities: [User, Post, Comment],
       synchronize: true,
+      // logging: true,
+      // logging: ['error', 'log'],
     }),
     AuthModule,
     PostsModule,

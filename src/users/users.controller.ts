@@ -22,6 +22,10 @@ export class UsersController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
+  @Get('deleted')
+  findAllWithDeleted() {
+    return this.usersService.findAllWithDeleted();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -36,6 +40,11 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Delete('delete/:id')
+  hardRemove(@Param('id') id: string) {
+    return this.usersService.hardRemove(+id);
   }
 
   @UseGuards(JwtAuthGuard)

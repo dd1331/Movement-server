@@ -6,7 +6,7 @@ const newPosts = [
   {
     id: 1,
     poster: 3,
-    title: 'test title 1',
+    title: 'test title 13',
     content: 'test content 1',
     like: 0,
     dislike: 0,
@@ -15,7 +15,7 @@ const newPosts = [
   {
     id: 2,
     poster: 3,
-    title: 'test title 2',
+    title: 'test title 23',
     content: 'test content 2',
     like: 0,
     dislike: 0,
@@ -24,7 +24,7 @@ const newPosts = [
   {
     id: 3,
     poster: 3,
-    title: 'test title 3',
+    title: 'test title 33',
     content: 'test content 3',
     like: 0,
     dislike: 0,
@@ -41,8 +41,8 @@ const newPosts = [
   },
 ];
 const createPostDto = {
-  poster: 3,
-  title: 'test title 1',
+  poster: 1,
+  title: 'test title 12',
   content: 'test content 1',
   // like: 0,
   // dislike: 0,
@@ -65,9 +65,10 @@ describe('Posts', () => {
   });
 
   it('Post posts/create ', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/posts/create')
-      .expect(201)
-      .send(createPostDto);
+      .send(createPostDto)
+      .expect(201);
+    console.log(res.body);
   });
 });

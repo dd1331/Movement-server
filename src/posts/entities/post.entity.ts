@@ -23,13 +23,13 @@ export class Post extends CommonEntity {
   @Column()
   content: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 0, nullable: true })
   like: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0, nullable: true })
   dislike: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0, nullable: true })
   views: number;
 
   @OneToMany((type) => Comment, (comment) => comment.postId)

@@ -11,56 +11,42 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
-    try {
-      await this.checkIfExist(createUserDto);
-      const newUser = await this.userRepo.create(createUserDto);
-      return newUser;
-    } catch (error) {
-      return error;
-    }
+    await this.checkIfExist(createUserDto);
+    const newUser = await this.userRepo.create(createUserDto);
+    await this.userRepo.save(newUser);
+    return newUser;
   }
   //temp any
   async checkIfExist(createUserDto: CreateUserDto): Promise<boolean> {
-    const { phone, name } = createUserDto;
-    const where = [{ phone }, { name }];
+    const { phone, userId, userName } = createUserDto;
+    const where = [{ phone }, { userId }, { userName }];
 
-    const isExist = await this.userRepo.findOne({ where });
-    if (isExist) {
-      throw new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          error: '이미 존재하는 **입니다',
-        },
-        HttpStatus.CONFLICT,
-      );
+    const isExisting = await this.userRepo.findOne({ where });
+    if (isExisting) {
+      throw new HttpException('이미 존재하는 **입니다', HttpStatus.CONFLICT);
     }
     return true;
   }
 
-  async findAll() {
-    const users = await this.userRepo.find();
+  async findAll(): Promise<User[]> {
+    const users: User[] = await this.userRepo.find();
+    return users;
+  }
+
+  async findAllWithDeleted(): Promise<User[]> {
+    const users: User[] = await this.userRepo.find({ withDeleted: true });
     return users;
   }
 
   async findOne(id: number) {
-    try {
-      const user = await this.userRepo.findOne({
-        where: { id, deletedAt: IsNull() },
-      });
-      if (!user) {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: 'user not found',
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return user;
-    } catch (error) {
-      return error;
+    const user: User = await this.userRepo.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     }
+
+    return user;
   }
 
   ///temp///
@@ -84,25 +70,17 @@ export class UsersService {
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
-
-  async remove(id: number): Promise<boolean> {
-    // const user = await this.userRepo.findOne(id);
-    try {
-      const user = await this.userRepo.findOne(id);
-      if (!user) {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: 'user not found',
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      const result = await this.userRepo.softDelete(id);
-      if (result) return true;
-      return false;
-    } catch (error) {
-      return error;
+  async remove(id: number): Promise<User> {
+    const user: User = await this.userRepo.findOne(id);
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     }
+    await this.userRepo.softDelete(id);
+
+    return user;
+  }
+  async hardRemove(id: number): Promise<boolean> {
+    await this.userRepo.delete(id);
+    return true;
   }
 }
