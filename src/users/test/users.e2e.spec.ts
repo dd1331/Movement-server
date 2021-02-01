@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { UsersService } from '../users.service';
 import { User } from '../entities/user.entity';
+import { UpdateUserDto } from '../dto/update-user.dto';
 const newUsers = [
   {
     id: 0,
@@ -112,8 +113,22 @@ describe('Users', () => {
     });
   });
   describe('UPDATE', () => {
+    const updateUserDto: UpdateUserDto = {
+      userName: 'updated userName',
+      userId: 'updated userId',
+      password: 'updated password',
+      phone: 'updated phone',
+    };
     it('/PUT update user', async () => {
-      // await request(app.getHttpServer().put());
+      const userId = createdUser.id;
+      const { body } = await request(app.getHttpServer())
+        .patch('/users/' + userId)
+        .send(updateUserDto);
+      console.log(body);
+      expect(body.userName).toBe(updateUserDto.userName);
+      expect(body.userId).toBe(updateUserDto.userId);
+      expect(body.password).toBe(updateUserDto.password);
+      expect(body.phone).toBe(updateUserDto.phone);
     });
   });
   describe('DELETE', () => {
@@ -124,6 +139,8 @@ describe('Users', () => {
       );
       // TODO softdelete is working but returning user with deleted column value null
       // is it comming from transaction problem?
+      // console.log(body);
+      expect(body.deletedAt).toBeTruthy();
     });
 
     it('/DELETE throw an error if user does not exist', async () => {

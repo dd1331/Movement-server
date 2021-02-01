@@ -67,8 +67,15 @@ export class UsersService {
   }
   ///temp///
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) return;
+
+    await this.userRepo.update(id, updateUserDto);
+
+    const updatedUser = await this.userRepo.findOne(id, { withDeleted: true });
+
+    return updatedUser;
   }
   async remove(id: number): Promise<User> {
     const user: User = await this.userRepo.findOne(id);
@@ -77,7 +84,9 @@ export class UsersService {
     }
     await this.userRepo.softDelete(id);
 
-    return user;
+    const deletedUser = await this.userRepo.findOne(id, { withDeleted: true });
+
+    return deletedUser;
   }
   async hardRemove(id: number): Promise<boolean> {
     await this.userRepo.delete(id);
