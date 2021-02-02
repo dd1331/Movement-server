@@ -10,8 +10,8 @@ export class PostsService {
   constructor(
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
   ) {}
-  async createPost(createPostDto: CreatePostDto): Promise<Post> {
-    const newPost = await this.postRepo.create(createPostDto);
+  async createPost(dto: CreatePostDto): Promise<Post> {
+    const newPost = await this.postRepo.create(dto);
     await this.postRepo.save(newPost);
     if (!newPost) {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
@@ -52,4 +52,17 @@ export class PostsService {
     await this.postRepo.softDelete(postId);
     return post;
   }
+
+  // checkPostValidation(dto: CreatePostDto): boolean {
+  //   const MIN_TITLE_LENGTH = 5;
+  //   const MIN_CONTENT_LENGTH = 5;
+  //   const { title, content } = dto;
+  //   if (
+  //     title.length < MIN_TITLE_LENGTH ||
+  //     content.length < MIN_CONTENT_LENGTH
+  //   ) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 }

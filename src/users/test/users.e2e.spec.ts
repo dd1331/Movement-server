@@ -83,7 +83,7 @@ describe('Users', () => {
     it('/GET users', async () => {
       const { body } = await request(app.getHttpServer())
         .get('/users')
-        .expect(200);
+        .expect(HttpStatus.OK);
       const users = await usersService.findAll();
       expect(Array.isArray(body)).toBeTruthy();
       expect(body.length).toBe(users.length);
