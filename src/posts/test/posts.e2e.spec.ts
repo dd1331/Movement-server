@@ -8,37 +8,21 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import { PostsService } from '../posts.service';
 import { Post } from '../entities/post.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
-const newUsers = [
-  {
-    id: 0,
-    userId: 'test id',
-    userName: 'test',
-    password: '123123',
-    phone: '01000000000',
-  },
-  {
-    id: 1,
-    userId: 'test id 1',
-    userName: 'test1',
-    password: '123123',
-    phone: '01000000001',
-  },
-  {
-    id: 2,
-    userId: 'test id 2',
-    userName: 'test2',
-    password: '123123',
-    phone: '01000000002',
-  },
-];
-
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+const newUser: CreateUserDto = {
+  userId: 'test id 2',
+  userName: 'test2',
+  password: '123123',
+  phone: '01000000002',
+};
 describe('Posts', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let postsService: PostsService;
   let user: User;
-  let createdPost: Post;
+  let post: Post;
   let createPostDto: CreatePostDto;
+  let updatePostDto: UpdatePostDto;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -49,20 +33,30 @@ describe('Posts', () => {
     postsService = moduleRef.get<PostsService>(PostsService);
     app = moduleRef.createNestApplication();
     await app.init();
-    const newUser = newUsers[0];
+  });
+  afterAll(async () => {
+    // const userRepo: Repository<User> = new Repository<User>();
+    // const postRepo: Repository<Post> = new Repository<Post>();
+    // // await userRepo.delete(user.id);
+    // await postRepo.delete(212);
+    await app.close();
+  });
+  beforeEach(async () => {
+    const [foundPost] = await postsService.readAllPosts();
+    post = foundPost ? foundPost : await postsService.createPost(createPostDto);
+
     const [foundUser] = await usersService.findAll();
-    user = foundUser;
-    if (!user) {
-      user = await usersService.create(newUser[0]);
-    }
+    user = foundUser ? foundUser : await usersService.create(newUser);
     createPostDto = {
       poster: user.id,
       title: 'test title 12',
       content: 'test content 1',
     };
-  });
-  afterAll(async () => {
-    await app.close();
+    updatePostDto = {
+      id: post.id,
+      title: 'updated title',
+      content: 'updated content',
+    };
   });
   describe('/POST createPost', () => {
     it('should return created object ', async () => {
@@ -73,113 +67,94 @@ describe('Posts', () => {
       expect(body.title).toBe(createPostDto.title);
       expect(body.content).toBe(createPostDto.content);
       expect(body.poster).toBe(createPostDto.poster);
-      createdPost = body;
     });
     it('should throw an error if values are not valid', async () => {
       const invalidCreatePostDto: CreatePostDto = {
-        // poster: user.id,
-        // temp
-        poster: 233,
+        poster: user.id,
         content: '',
         title: '',
       };
-      await request(app.getHttpServer())
+      const { body } = await request(app.getHttpServer())
         .post('/posts/create')
         .send(invalidCreatePostDto)
         .expect(HttpStatus.BAD_REQUEST);
-      invalidCreatePostDto.content = 'added content';
-      await request(app.getHttpServer())
-        .post('/posts/create')
-        .send(invalidCreatePostDto)
-        .expect(HttpStatus.BAD_REQUEST);
-      invalidCreatePostDto.title = 'added title';
-      await request(app.getHttpServer())
-        .post('/posts/create')
-        .send(invalidCreatePostDto)
-        .expect(HttpStatus.CREATED);
+      expect(body.message).toHaveLength(2); // title, content
     });
   });
   describe('/GET readPost', () => {
-    const postId = createdPost.id;
     it('should return a post object', async () => {
+      const postId = post.id;
       const { body } = await request(app.getHttpServer()).get(
-        `/posts/:${postId}`,
+        `/posts/${postId}`,
       );
-      expect(body.title).toBe(createdPost.title);
-      expect(body.content).toBe(createdPost.content);
-      expect(body.title).toBe(createdPost.title);
+      expect(body.title).toBe(post.title);
+      expect(body.content).toBe(post.content);
+      expect(body.title).toBe(post.title);
     });
     it('should throw an error if post is not found', async () => {
-      const invalidPostId = 999999999;
+      const nonExistentPostId = 9999999;
       await request(app.getHttpServer())
-        .get(`/posts/:${invalidPostId}`)
+        .get(`/posts/${nonExistentPostId}`)
         .expect(HttpStatus.NOT_FOUND);
     });
   });
   describe('/GET readAllPosts', () => {
-    const posts = postsService.readAllPosts();
     it('should return post array', async () => {
+      const posts = await postsService.readAllPosts();
       const { body } = await request(app.getHttpServer())
         .get('/posts')
         .expect(HttpStatus.OK);
-      expect(body).toStrictEqual(posts);
+      expect(body).toHaveLength(posts.length);
     });
     it('should throw an error if there is no post', async () => {
       // TODO write code
-      // const res = await request(app.getHttpServer())
-      //   .get('/posts')
-      //   .expect(HttpStatus.NOT_FOUND);
     });
   });
   describe('/PATCH updatePost', () => {
-    const poster: number = createdPost.poster;
-    const updatePostDto: UpdatePostDto = {
-      title: 'updated title',
-      content: 'updated content',
-      // postId: createdPost.id,
-      //TEMP
-      postId: 55,
-    };
     it('should return updated post object', async () => {
       const { body } = await request(app.getHttpServer())
-        .patch(`/posts/:${poster}`)
+        .patch('/posts')
         .send(updatePostDto)
-        .expect(HttpStatus.CREATED);
+        .expect(HttpStatus.OK);
       expect(body.title).toBe(updatePostDto.title);
-      expect(body.const).toBe(updatePostDto.content);
+      expect(body.content).toBe(updatePostDto.content);
     });
 
     it('should throw an error if data is not valid', async () => {
       const invalidUpdatePostDto: UpdatePostDto = {
+        ...updatePostDto,
         title: '',
         content: '',
-        postId: 44,
       };
       const { body } = await request(app.getHttpServer())
-        .patch(`/posts/:${poster}`)
+        .patch('/posts')
         .send(invalidUpdatePostDto)
         .expect(HttpStatus.BAD_REQUEST);
+      expect(body.message).toHaveLength(2); // title, content
     });
     it('should throw an error if the post is not existing', async () => {
+      const invalidUpdatePostDto: UpdatePostDto = { ...updatePostDto };
+      invalidUpdatePostDto.id = 99999;
       const { body } = await request(app.getHttpServer())
-        .patch(`/posts/:${poster}`)
-        .send(updatePostDto)
+        .patch('/posts')
+        .send(invalidUpdatePostDto)
         .expect(HttpStatus.NOT_FOUND);
+      expect(body.message).toBe('존재하지 않는 게시글입니다');
     });
   });
-
   describe('/DELETE deletePost', () => {
-    const postId = createdPost.id;
     it('should return deleted post object', async () => {
       const { body } = await request(app.getHttpServer())
-        .delete(`posts/:${postId}`)
+        .delete(`/posts/${post.id}`)
         .expect(HttpStatus.OK);
-      expect(body.deleteAt).toBeTruthy();
+      expect(body).toBeTruthy();
     });
     it('should throw an erorr if post does not exist or already deleted', async () => {
-      await request(app.getHttpServer())
-        .delete(`posts/:${postId}`)
+      const { body } = await request(app.getHttpServer())
+        .delete(`/posts/${post.id - 1}`)
         .expect(HttpStatus.NOT_FOUND);
+      expect(body.statusCode).toBe(HttpStatus.NOT_FOUND);
+      expect(body.message).toBe('존재하지 않는 게시글입니다');
     });
   });
 });

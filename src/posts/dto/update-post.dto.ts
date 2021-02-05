@@ -6,5 +6,5 @@ export class UpdatePostDto {
   @IsNotEmpty()
   content: string;
   @IsNumber()
-  postId: number;
+  id: number;
 }

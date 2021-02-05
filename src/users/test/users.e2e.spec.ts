@@ -71,7 +71,6 @@ describe('Users', () => {
         .send(newUser)
         .expect(201);
       const { userId, userName, phone, role } = response.body;
-      expect(response.body).toBeDefined();
       expect(userId).toBe(newUser.userId);
       expect(userName).toBe(newUser.userName);
       expect(phone).toBe(newUser.phone);

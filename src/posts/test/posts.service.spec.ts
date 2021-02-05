@@ -163,7 +163,7 @@ describe('PostsService', () => {
     const updateDto = {
       title: 'updated title',
       content: 'updated content',
-      postId: 3,
+      id: 3,
     };
     it('should be defined', () => {
       expect(service.updatePost).toBeDefined();
@@ -200,7 +200,7 @@ describe('PostsService', () => {
       }
       expect(repo.findOne).toBeCalledTimes(1);
       expect(repo.findOne).toBeCalledWith({
-        where: { id: updateDto.postId, deletedAt: IsNull() },
+        where: { id: updateDto.id, deletedAt: IsNull() },
       });
     });
   });
