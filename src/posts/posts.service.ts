@@ -46,10 +46,11 @@ export class PostsService {
     return updatedPost;
   }
   async deletePost(postId: number): Promise<Post> {
+    // TODO softdelete related comments
     const post = await this.readPost(postId);
     if (!post) return;
     post.deletedAt = new Date();
-    await post.save();
+    await this.postRepo.save(post);
     return post;
   }
 

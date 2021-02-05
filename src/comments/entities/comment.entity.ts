@@ -8,18 +8,24 @@ export class Comment extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => User, (user) => user.comments)
-  commenter: number;
+  @Column()
+  postId: number;
+
+  @Column()
+  commenterId: number;
 
   @Column()
   content: string;
 
-  @Column()
+  @Column({ default: 0, nullable: true })
   like: number;
 
-  @Column()
+  @Column({ default: 0, nullable: true })
   dislike: number;
 
-  @ManyToOne((type) => Post, (post) => post.comments)
-  postId: string;
+  @ManyToOne(() => User, (user) => user.comments)
+  commenter: User;
+
+  @ManyToOne(() => Post, (post) => post.comments)
+  post: Post;
 }

@@ -33,5 +33,5 @@ export class Post extends CommonEntity {
   views: number;
 
   @OneToMany((type) => Comment, (comment) => comment.postId)
-  comments: string;
+  comments: Comment[];
 }
