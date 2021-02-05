@@ -9,6 +9,8 @@ import { Comment } from './comments/entities/comment.entity';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { APP_PIPE } from '@nestjs/core';
+import { CommentsService } from './comments/comments.service';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { APP_PIPE } from '@nestjs/core';
     }),
     AuthModule,
     PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -36,6 +39,7 @@ import { APP_PIPE } from '@nestjs/core';
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
+    CommentsService,
     //Note that in terms of dependency injection, global pipes registered from outside of any module (with useGlobalPipes() as in the example above) cannot inject dependencies since the binding has been done outside the context of any module. In order to solve this issue, you can set up a global pipe directly from any module using the following construction:
   ],
 })
