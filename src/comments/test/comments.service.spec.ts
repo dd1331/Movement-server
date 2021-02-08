@@ -4,8 +4,8 @@ import { Comment } from '../entities/comment.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCommentDto } from '../dto/create-comment-dto';
 import { HttpStatus } from '@nestjs/common';
-import { Post } from 'src/posts/entities/post.entity';
-import { PostsService } from 'src/posts/posts.service';
+import { Post } from '../../posts/entities/post.entity';
+import { PostsService } from '../../posts/posts.service';
 import { CommentsService } from '../comments.service';
 import { UpdateCommentDto } from '../dto/update-comment-dto';
 
@@ -16,13 +16,26 @@ describe('CommentsService', () => {
   let createCommentDto: CreateCommentDto;
   let createdComment: Partial<Comment>;
   let updateCommentDto: UpdateCommentDto;
-  let post: Post;
+  let post: Partial<Post>;
   let postsService: PostsService;
-  let comments: Comment[];
+  let comments: Partial<Comment>[];
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        PostsService,
+        {
+          provide: getRepositoryToken(Post),
+          useValue: {
+            create: jest.fn(),
+            find: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+            findOne: jest.fn(),
+            softDelete: jest.fn(),
+            save: jest.fn(),
+          },
+        },
         CommentsService,
         {
           provide: getRepositoryToken(Comment),
@@ -33,12 +46,14 @@ describe('CommentsService', () => {
             delete: jest.fn(),
             findOne: jest.fn(),
             softDelete: jest.fn(),
+            save: jest.fn(),
           },
         },
       ],
     }).compile();
 
     postsService = module.get<PostsService>(PostsService);
+    postRepo = module.get<Repository<Post>>(getRepositoryToken(Post));
     commentsService = module.get<CommentsService>(CommentsService);
     commentRepo = module.get<Repository<Comment>>(getRepositoryToken(Comment));
   });
@@ -58,8 +73,33 @@ describe('CommentsService', () => {
       id: createdComment.id,
       content: 'updated content',
     };
-    [post] = await postsService.readAllPosts();
-    comments = await commentsService.readAllComments();
+    comments = [
+      {
+        id: 0,
+        postId: 50,
+        content: 'test',
+        commenterId: 10,
+      },
+      {
+        id: 1,
+        postId: 50,
+        content: 'test2',
+        commenterId: 10,
+      },
+      {
+        id: 2,
+        postId: 50,
+        content: 'test3',
+        commenterId: 10,
+      },
+    ];
+    post = {
+      id: 50,
+      title: 'tset title',
+      content: 'test content',
+    };
+    // comments = await commentsService.readPostComments(post.id);
+    // comments = await commentsService.readAllComments();
   });
 
   it('should be defined', () => {
@@ -72,30 +112,40 @@ describe('CommentsService', () => {
     });
     it('should return a created object', async () => {
       (commentRepo.create as jest.Mock).mockReturnValue(createdComment);
+      // (commentRepo.save as jest.Mock).mockReturnValue(comments[0]);
       const res = await commentsService.createComment(createCommentDto);
-      expect(res.id).toBe(expect.any('number'));
-      expect(res.postId).toBe(expect.any('number'));
-      expect(res.commenterId).toBe(expect.any('number'));
-      expect(res.content).toBe(expect.any('string'));
+      expect(res.id).toEqual(expect.any(Number));
+      expect(res.postId).toEqual(expect.any(Number));
+      expect(res.commenterId).toEqual(expect.any(Number));
+      expect(res.content).toEqual(expect.any(String));
+      expect(commentRepo.create).toBeCalledWith(createCommentDto);
+      expect(commentRepo.save).toBeCalled();
     });
     it('should throw an error if content is empty', async () => {
-      (commentRepo.create as jest.Mock).mockReturnValue(null);
-      try {
-        await commentsService.createComment(createCommentDto);
-      } catch (err) {
-        expect(err.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(err.message).toBe('댓글 작성에 실패했습니다');
-      }
-      expect(commentRepo.create).toHaveBeenCalledWith(createCommentDto);
+      // TODO e2e test or controller test?
+      // (commentRepo.create as jest.Mock).mockReturnValue(null);
+      // (postRepo.findOne as jest.Mock).mockReturnValue(comments[0]);
+      // const invalidCreateCommentDto: CreateCommentDto = {
+      //   ...createCommentDto,
+      //   content: '',
+      // };
+      // try {
+      //   await commentsService.createComment(invalidCreateCommentDto);
+      // } catch (err) {
+      //   expect(err.status).toBe(HttpStatus.BAD_REQUEST);
+      //   expect(err.message).toBe('댓글 작성에 실패했습니다');
+      // }
+      // expect(commentRepo.create).toHaveBeenCalledWith(invalidCreateCommentDto);
+      // expect(commentRepo.save).toBeCalledTimes(0);
     });
     it('should throw an error if post does not exist', async () => {
-      // (commentRepo.create as jest.Mock).mockReturnValue(null);
+      (commentRepo.create as jest.Mock).mockReturnValue(null);
       (postRepo.findOne as jest.Mock).mockReturnValue(null);
       try {
         await commentsService.createComment(createCommentDto);
       } catch (err) {
         expect(err.status).toBe(HttpStatus.NOT_FOUND);
-        expect(err.message).toBe('게시글이 존재하지 않습니다');
+        expect(err.message).toBe('존재하지 않는 게시글입니다');
       }
       expect(postRepo.findOne).toHaveBeenCalledWith(createCommentDto.postId);
       expect(commentRepo.create).toHaveBeenCalledTimes(0);
@@ -103,29 +153,48 @@ describe('CommentsService', () => {
   });
   describe('READ', () => {
     it('should be defined', async () => {
-      expect(commentsService.readComments).toBeDefined();
-      expect(typeof commentsService.readComments).toBe('function');
+      expect(commentsService.readPostComments).toBeDefined();
+      expect(typeof commentsService.readPostComments).toBe('function');
+    });
+    it('should return a comment obejct', async () => {
+      (commentRepo.findOne as jest.Mock).mockReturnValue(comments[0]);
+      const res = await commentsService.readComment(comments[0].id);
+      expect(commentRepo.findOne).toBeCalledWith(comments[0].id);
+      expect(res.commenterId).toBe(comments[0].commenterId);
+      expect(res.content).toBe(comments[0].content);
+      expect(res.postId).toBe(comments[0].postId);
+      expect(res.id).toBe(comments[0].id);
+    });
+    it('should throw an error if the comment is not existing', async () => {
+      (commentRepo.findOne as jest.Mock).mockReturnValue(null);
+      const invalidCommentId = 9999;
+      try {
+        await commentsService.readComment(invalidCommentId);
+      } catch (error) {
+        expect(error.status).toBe(HttpStatus.NOT_FOUND);
+        expect(error.message).toBe('댓글이 존재하지 않습니다');
+      }
+      expect(commentRepo.findOne).toBeCalledWith(invalidCommentId);
     });
     it('should return comment list on a specified post', async () => {
       (postRepo.findOne as jest.Mock).mockReturnValue(post);
       (commentRepo.find as jest.Mock).mockReturnValue(comments);
-      const res = await commentsService.readComments(createdComment.postId);
-      expect(postRepo.findOne).toHaveBeenCalledWith(createdComment.postId);
-      expect(res).toHaveLength(post.comments.length);
+      const res = await commentsService.readPostComments(createdComment.postId);
+      expect(res).toHaveLength(res.length);
       expect(res).toStrictEqual(comments);
-      expect(res).toBe(expect.any(Array));
+      expect(res).toEqual(expect.any(Array));
     });
     it('should throw an error if no comment exist on a specified post', async () => {
-      (postRepo.findOne as jest.Mock).mockReturnValue(post);
       (commentRepo.find as jest.Mock).mockReturnValue(null);
       try {
-        await commentsService.readComments(createdComment.postId);
+        await commentsService.readPostComments(createdComment.postId);
       } catch (error) {
-        expect(error.statusCode).toBe(HttpStatus.NOT_FOUND);
+        expect(error.status).toBe(HttpStatus.NOT_FOUND);
         expect(error.message).toBe('댓글이 존재하지 않습니다');
       }
-      expect(postRepo.findOne).toHaveBeenCalledWith(createdComment.postId);
-      expect(commentRepo.find).toHaveBeenCalledTimes(0);
+      expect(commentRepo.find).toHaveBeenCalledWith({
+        where: { postId: createdComment.postId },
+      });
     });
   });
 
@@ -135,27 +204,37 @@ describe('CommentsService', () => {
       expect(typeof commentsService.updateComment).toBe('function');
     });
     it('should return updated comment', async () => {
-      (commentRepo.findOne as jest.Mock).mockReturnValue(expect.any(Comment));
-      (commentRepo.save as jest.Mock).mockReturnValue(expect.any(Comment));
-      const res = await commentsService.updateComment(updateCommentDto);
+      const updatedComment: Partial<Comment> = {
+        ...createdComment,
+        id: updateCommentDto.id,
+        content: updateCommentDto.content,
+      };
+      (commentRepo.findOne as jest.Mock).mockReturnValue(createdComment);
+      (commentRepo.save as jest.Mock).mockReturnValue(updatedComment);
+      const res: Comment = await commentsService.updateComment(
+        updateCommentDto,
+      );
       expect(res.id).toBe(updateCommentDto.id);
       expect(res.content).toBe(updateCommentDto.content);
+      expect(commentRepo.findOne).toBeCalledWith(updateCommentDto.id);
+      expect(commentRepo.save).toBeCalledTimes(1);
     });
     it('should throw error if input data is not valid', async () => {
-      (commentRepo.findOne as jest.Mock).mockReturnValue(expect.any(Comment));
-      (commentRepo.save as jest.Mock).mockReturnValue(expect.any(Comment));
-      const invalidUpdateCommentDto = {
-        ...updateCommentDto,
-        content: '',
-      };
-      try {
-        await commentsService.updateComment(invalidUpdateCommentDto);
-      } catch (error) {
-        expect(error.statusCode).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toHaveLength(1);
-      }
-      expect(commentRepo.find).toBeCalledWith(createdComment.id);
-      expect(commentRepo.save).toBeCalledTimes(0);
+      // TODO e2e or controller test
+      // (commentRepo.findOne as jest.Mock).mockReturnValue(createdComment);
+      // (commentRepo.save as jest.Mock).mockReturnValue(expect.any(Comment));
+      // const invalidUpdateCommentDto = {
+      //   ...updateCommentDto,
+      //   content: '',
+      // };
+      // try {
+      //   await commentsService.updateComment(invalidUpdateCommentDto);
+      // } catch (error) {
+      //   expect(error.statusCode).toBe(HttpStatus.BAD_REQUEST);
+      //   expect(error.message).toHaveLength(1);
+      // }
+      // expect(commentRepo.find).toBeCalledWith(invalidUpdateCommentDto.id);
+      // expect(commentRepo.save).toBeCalledTimes(0);
     });
     it('should throw an error if comment does not exist', async () => {
       (commentRepo.findOne as jest.Mock).mockReturnValue(expect.any(Comment));
@@ -171,7 +250,6 @@ describe('CommentsService', () => {
         expect(error.message).toBe('댓글이 존재하지 않습니다');
       }
       expect(commentRepo.findOne).toBeCalledWith(invalidUpdateCommentDto.id);
-      expect(commentRepo.save).toBeCalledTimes(0);
     });
   });
   describe('DELETE', () => {
@@ -189,15 +267,13 @@ describe('CommentsService', () => {
     });
     it('should throw an error if comment does not exist', async () => {
       (commentRepo.findOne as jest.Mock).mockReturnValue(null);
-      (commentRepo.save as jest.Mock).mockReturnValue(comments[0]);
       try {
         await commentsService.deleteComment(9999999);
       } catch (error) {
-        expect(error.statusCode).toBe(HttpStatus.NOT_FOUND);
+        expect(error.status).toBe(HttpStatus.NOT_FOUND);
         expect(error.message).toBe('댓글이 존재하지 않습니다');
       }
       expect(commentRepo.findOne).toBeCalledWith(9999999);
-      expect(commentRepo.save).toBeCalledTimes(0);
     });
   });
 });

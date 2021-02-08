@@ -28,9 +28,7 @@ export class PostsService {
     return post;
   }
   async readAllPosts(): Promise<Post[]> {
-    const posts = await this.postRepo.find({
-      where: { deletedAt: IsNull() },
-    });
+    const posts = await this.postRepo.find();
 
     return posts;
   }
