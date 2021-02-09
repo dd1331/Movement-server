@@ -9,12 +9,14 @@ import { Comment } from './comments/entities/comment.entity';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { APP_PIPE } from '@nestjs/core';
-import { CommentsService } from './comments/comments.service';
 import { CommentsModule } from './comments/comments.module';
+import { PostsController } from './posts/posts.controller';
+import { AuthController } from './auth/auth.controller';
+import { UsersController } from './users/users.controller';
+import { CommentsController } from './comments/comments.controller';
 
 @Module({
   imports: [
-    UsersModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -27,11 +29,18 @@ import { CommentsModule } from './comments/comments.module';
       // logging: true,
       // logging: ['error', 'log'],
     }),
+    UsersModule,
     AuthModule,
     PostsModule,
     CommentsModule,
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+    PostsController,
+    AuthController,
+    UsersController,
+    CommentsController,
+  ],
   providers: [
     AppService,
     //Note that in terms of dependency injection, global pipes registered from outside of any module (with useGlobalPipes() as in the example above) cannot inject dependencies since the binding has been done outside the context of any module. In order to solve this issue, you can set up a global pipe directly from any module using the following construction:
@@ -39,7 +48,7 @@ import { CommentsModule } from './comments/comments.module';
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
-    CommentsService,
+    // CommentsService, // TODO 넣으면 에러
     //Note that in terms of dependency injection, global pipes registered from outside of any module (with useGlobalPipes() as in the example above) cannot inject dependencies since the binding has been done outside the context of any module. In order to solve this issue, you can set up a global pipe directly from any module using the following construction:
   ],
 })

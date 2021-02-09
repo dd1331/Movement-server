@@ -11,17 +11,23 @@ export class User extends CommonEntity {
   @Column({ unique: true, name: 'user_id' })
   userId: string;
 
+  @Column({ unique: true, name: 'naver_id', nullable: true })
+  naverId: string;
+
   @Column({ unique: true, name: 'user_name' })
   userName: string;
 
   @Column()
   password: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   phone: string;
 
   @Column({ default: 'user' })
   role: string;
+
+  @Column({ default: 'normal' })
+  provider: string;
 
   @OneToMany((type) => Post, (post) => post.poster)
   posts: [Post];

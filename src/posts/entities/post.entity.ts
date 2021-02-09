@@ -32,6 +32,6 @@ export class Post extends CommonEntity {
   @Column({ default: 0, nullable: true })
   views: number;
 
-  @OneToMany((type) => Comment, (comment) => comment.postId)
+  @OneToMany((type) => Comment, (comment) => comment.post)
   comments: Comment[];
 }

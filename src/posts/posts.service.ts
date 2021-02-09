@@ -28,7 +28,9 @@ export class PostsService {
     return post;
   }
   async readAllPosts(): Promise<Post[]> {
-    const posts = await this.postRepo.find();
+    const posts = await this.postRepo.find({
+      relations: ['poster', 'comments'],
+    });
 
     return posts;
   }
