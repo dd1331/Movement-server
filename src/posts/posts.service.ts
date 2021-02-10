@@ -19,7 +19,10 @@ export class PostsService {
     return newPost;
   }
   async readPost(id: number): Promise<Post> {
-    const post = await this.postRepo.findOne(id);
+    const post = await this.postRepo.findOne(id, {
+      relations: ['poster', 'comments', 'comments.commenter'],
+    });
+    console.log(post);
     if (!post)
       throw new HttpException(
         '존재하지 않는 게시글입니다',

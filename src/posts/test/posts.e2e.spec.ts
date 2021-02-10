@@ -8,7 +8,7 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import { PostsService } from '../posts.service';
 import { Post } from '../entities/post.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto } from '../../users/dto/create-user.dto';
 const newUser: CreateUserDto = {
   userId: 'test id 2',
   userName: 'test2',
@@ -47,12 +47,12 @@ describe('Posts', () => {
 
     const [foundUser] = await usersService.findAll();
     user = foundUser ? foundUser : await usersService.create(newUser);
-    createPostDto = {
+    createPostDto: createPostDto = {
       poster: user.id,
       title: 'test title 12',
       content: 'test content 1',
     };
-    updatePostDto = {
+    updatePostDto: updatePostDto = {
       id: post.id,
       title: 'updated title',
       content: 'updated content',
