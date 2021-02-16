@@ -10,11 +10,9 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { APP_PIPE } from '@nestjs/core';
 import { CommentsModule } from './comments/comments.module';
-import { PostsController } from './posts/posts.controller';
-import { AuthController } from './auth/auth.controller';
-import { UsersController } from './users/users.controller';
-import { CommentsController } from './comments/comments.controller';
 import { Like } from './like.entity';
+import { Category } from './common/entities/category.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -25,7 +23,7 @@ import { Like } from './like.entity';
       username: 'charlie',
       password: '1331',
       database: 'movement',
-      entities: [User, Post, Comment, Like],
+      entities: [User, Post, Comment, Like, Category],
       synchronize: true,
       // logging: true,
       // logging: ['error', 'log'],
@@ -34,6 +32,7 @@ import { Like } from './like.entity';
     AuthModule,
     PostsModule,
     CommentsModule,
+    CommonModule,
   ],
   controllers: [
     AppController,
