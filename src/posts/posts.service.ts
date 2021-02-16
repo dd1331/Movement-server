@@ -27,6 +27,7 @@ export class PostsService {
     //TODO exclude softdeleted likes
     const post = await this.postRepo.findOne(id, {
       relations: ['poster', 'comments', 'comments.commenter', 'likes'],
+      withDeleted: false,
     });
     if (!post) {
       throw new HttpException(

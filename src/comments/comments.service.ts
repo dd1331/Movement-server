@@ -50,6 +50,8 @@ export class CommentsService {
   async deleteComment(commentId: number): Promise<Comment> {
     const comment = await this.readComment(commentId);
     if (!comment) return;
-    return;
+    comment.deletedAt = new Date();
+    await this.commentRepo.save(comment);
+    return comment;
   }
 }
