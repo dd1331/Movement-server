@@ -11,6 +11,7 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { CreateLikeDto } from '../create-like-dto';
 
 @Controller('posts')
 export class PostsController {
@@ -39,5 +40,13 @@ export class PostsController {
   @Delete(':id')
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
+  }
+  @Post('like')
+  likePost(@Body() dto: CreateLikeDto) {
+    return this.postsService.likeOrDislikePost(dto);
+  }
+  @Post('dislike')
+  dislikePost(@Body() dto: CreateLikeDto) {
+    return this.postsService.likeOrDislikePost(dto);
   }
 }

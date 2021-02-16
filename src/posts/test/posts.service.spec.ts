@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Post } from '../entities/post.entity';
 import { HttpStatus } from '@nestjs/common';
+import { Like } from '../../like.entity';
+import { CreateLikeDto } from 'src/create-like-dto';
 const newPosts = [
   {
     id: 1,
@@ -62,6 +64,18 @@ describe('PostsService', () => {
         PostsService,
         {
           provide: getRepositoryToken(Post),
+          useValue: {
+            create: jest.fn(),
+            find: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+            findOne: jest.fn(),
+            softDelete: jest.fn(),
+            save: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(Like),
           useValue: {
             create: jest.fn(),
             find: jest.fn(),
@@ -239,6 +253,29 @@ describe('PostsService', () => {
       }
       expect(repo.findOne).toBeCalledTimes(1);
       expect(repo.findOne).toBeCalledWith(2);
+    });
+  });
+  describe('likePost', () => {
+    it('shoud be defined', () => {
+      expect(service.likeOrDislikePost).toBeDefined();
+      expect(typeof service.likeOrDislikePost).toBe('function');
+    });
+    it('should return liked post', async () => {
+      const postId = 3;
+      const createLikeDto: CreateLikeDto = {
+        postId: 3,
+        userId: 233,
+        type: 'post',
+        isLike: true,
+      };
+      const likedPost = { ...newPosts[0], like: newPosts[0].like + 1 };
+      (repo.findOne as jest.Mock).mockReturnValue(newPosts[0]);
+      (repo.save as jest.Mock).mockReturnValue(likedPost);
+      const [like] = await service.likeOrDislikePost(createLikeDto);
+      console.log(likedPost);
+      expect(like).toBe(likedPost.like);
+      expect(repo.findOne).toBeCalledWith(postId);
+      expect(repo.save).toBeCalledWith(likedPost);
     });
   });
 });

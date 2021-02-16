@@ -14,6 +14,7 @@ import { PostsController } from './posts/posts.controller';
 import { AuthController } from './auth/auth.controller';
 import { UsersController } from './users/users.controller';
 import { CommentsController } from './comments/comments.controller';
+import { Like } from './like.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { CommentsController } from './comments/comments.controller';
       username: 'charlie',
       password: '1331',
       database: 'movement',
-      entities: [User, Post, Comment],
+      entities: [User, Post, Comment, Like],
       synchronize: true,
       // logging: true,
       // logging: ['error', 'log'],
@@ -36,10 +37,11 @@ import { CommentsController } from './comments/comments.controller';
   ],
   controllers: [
     AppController,
-    PostsController,
-    AuthController,
-    UsersController,
-    CommentsController,
+    // NOTE no need to be added cause modules above are including controllers ?
+    // PostsController,
+    // AuthController,
+    // UsersController,
+    // CommentsController,
   ],
   providers: [
     AppService,

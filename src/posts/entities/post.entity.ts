@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Comment } from '../../comments/entities/comment.entity';
+import { Like } from '../../like.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -24,14 +25,11 @@ export class Post extends CommonEntity {
   content: string;
 
   @Column({ default: 0, nullable: true })
-  like: number;
-
-  @Column({ default: 0, nullable: true })
-  dislike: number;
-
-  @Column({ default: 0, nullable: true })
   views: number;
 
   @OneToMany((type) => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  @OneToMany(() => Like, (like) => like.post)
+  likes: Like[];
 }

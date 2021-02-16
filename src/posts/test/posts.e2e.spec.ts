@@ -9,6 +9,7 @@ import { PostsService } from '../posts.service';
 import { Post } from '../entities/post.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
+import { CreateLikeDto } from '../../create-like-dto';
 const newUser: CreateUserDto = {
   userId: 'test id 2',
   userName: 'test2',
@@ -155,6 +156,34 @@ describe('Posts', () => {
         .expect(HttpStatus.NOT_FOUND);
       expect(body.statusCode).toBe(HttpStatus.NOT_FOUND);
       expect(body.message).toBe('존재하지 않는 게시글입니다');
+    });
+  });
+  describe('/POST likePost', () => {
+    it('should return created like obejct', async () => {
+      const createLikeDto: CreateLikeDto = {
+        type: 'post',
+        isLike: true,
+        postId: 232,
+        userId: 233,
+      };
+      const { body } = await request(app.getHttpServer())
+        .post('/posts/like')
+        .send(createLikeDto);
+      console.log(body);
+    });
+  });
+  describe('/POST dislikePost', () => {
+    it('should return created like obejct', async () => {
+      const createLikeDto: CreateLikeDto = {
+        type: 'post',
+        isLike: true,
+        postId: 50,
+        userId: 233,
+      };
+      const { body } = await request(app.getHttpServer())
+        .post('/posts/dislike')
+        .send(createLikeDto);
+      console.log(body);
     });
   });
 });
