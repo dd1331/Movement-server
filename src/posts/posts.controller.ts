@@ -13,7 +13,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreateLikeDto } from '../create-like-dto';
 
-@Controller('posts')
+@Controller('posts/:category')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
@@ -28,8 +28,8 @@ export class PostsController {
   }
 
   @Get()
-  readAllPosts() {
-    return this.postsService.readAllPosts();
+  readAllPosts(@Param('category') category: string) {
+    return this.postsService.readAllPosts(category);
   }
 
   @Patch()

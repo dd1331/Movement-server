@@ -5,10 +5,13 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../like.entity';
+import { Category } from 'src/common/entities/category.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -26,6 +29,13 @@ export class Post extends CommonEntity {
 
   @Column({ default: 0, nullable: true })
   views: number;
+
+  @Column()
+  category: string;
+
+  @ManyToMany(() => Category)
+  @JoinTable({ joinColumns: [{ name: 'category' }] })
+  categories: Category[];
 
   @OneToMany((type) => Comment, (comment) => comment.post)
   comments: Comment[];
