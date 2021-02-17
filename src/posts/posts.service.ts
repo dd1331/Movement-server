@@ -42,12 +42,15 @@ export class PostsService {
         HttpStatus.NOT_FOUND,
       );
     }
+    post.views += 1;
+    await this.postRepo.save(post);
     return post;
   }
 
-  async readAllPosts(category: string): Promise<Post[]> {
+  async readAllPosts(category?: string): Promise<Post[]> {
+    const where = category ? { category } : null;
     const posts = await this.postRepo.find({
-      where: { category },
+      where,
       relations: ['poster', 'comments'],
     });
 

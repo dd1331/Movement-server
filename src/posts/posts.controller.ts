@@ -13,7 +13,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreateLikeDto } from '../create-like-dto';
 
-@Controller('posts/:category')
+@Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
@@ -21,15 +21,14 @@ export class PostsController {
   create(@Body() dto: CreatePostDto) {
     return this.postsService.createPost(dto);
   }
+  @Get('readAll/:category?')
+  readAllPosts(@Param('category') category: string) {
+    return this.postsService.readAllPosts(category);
+  }
 
   @Get(':id')
   readPost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.readPost(id);
-  }
-
-  @Get()
-  readAllPosts(@Param('category') category: string) {
-    return this.postsService.readAllPosts(category);
   }
 
   @Patch()
