@@ -13,6 +13,7 @@ import { CommentsModule } from './comments/comments.module';
 import { Like } from './like.entity';
 import { Category } from './common/entities/category.entity';
 import { CommonModule } from './common/common.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CommonModule } from './common/common.module';
     PostsModule,
     CommentsModule,
     CommonModule,
+    NewsModule,
   ],
   controllers: [
     AppController,
