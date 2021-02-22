@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
 import { Post } from './posts/entities/post.entity';
 import { Comment } from './comments/entities/comment.entity';
@@ -14,17 +15,21 @@ import { Like } from './like.entity';
 import { Category } from './common/entities/category.entity';
 import { CommonModule } from './common/common.module';
 import { NewsModule } from './news/news.module';
+import { FilesModule } from './files/files.module';
+import { AwsModule } from './aws/aws.module';
+import { File } from './files/entities/file.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'charlie',
-      password: '1331',
-      database: 'movement',
-      entities: [User, Post, Comment, Like, Category],
+      host: process.env.DATABASE_HOST,
+      port: parseInt(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME,
+      entities: [User, Post, Comment, Like, Category, File],
       synchronize: true,
       // logging: true,
       // logging: ['error', 'log'],
@@ -35,6 +40,8 @@ import { NewsModule } from './news/news.module';
     CommentsModule,
     CommonModule,
     NewsModule,
+    FilesModule,
+    AwsModule,
   ],
   controllers: [
     AppController,

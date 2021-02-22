@@ -7,15 +7,17 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like.entity';
 import { CreateLikeDto } from '../create-like-dto';
 import { UsersService } from '../users/users.service';
-import { Category } from 'src/common/entities/category.entity';
+import { Category } from '../common/entities/category.entity';
+import { File } from '../files/entities/file.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
-    @InjectRepository(Category)
-    private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(File) private readonly fileRepo: Repository<File>,
+    // @InjectRepository(Category)
+    // private readonly categoryRepo: Repository<Category>,
     private usersService: UsersService,
   ) {}
   async createPost(dto: CreatePostDto): Promise<Post> {
@@ -23,10 +25,13 @@ export class PostsService {
     if (!newPost) {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
     }
-    const category = await this.categoryRepo.findOne({
-      where: { title: dto.category },
-    });
-    newPost.categories = [category];
+    // const category = await this.categoryRepo.findOne({
+    //   where: { title: dto.category },
+    // });
+    // newPost.category = [category];
+    // const file = await this.fileRepo.create({ dto.location });
+    const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
+    newPost.files = newFiles;
     await this.postRepo.save(newPost);
     return newPost;
   }

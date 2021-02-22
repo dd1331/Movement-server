@@ -11,7 +11,8 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../like.entity';
-import { Category } from 'src/common/entities/category.entity';
+import { Category } from '../../common/entities/category.entity';
+import { File } from '../../files/entities/file.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -33,9 +34,12 @@ export class Post extends CommonEntity {
   @Column()
   category: string;
 
-  @ManyToMany(() => Category)
-  @JoinTable({ joinColumns: [{ name: 'category' }] })
-  categories: Category[];
+  // @ManyToMany(() => Category)
+  // @JoinTable({ joinColumns: [{ name: 'category' }] })
+  // categories: Category[];
+
+  @OneToMany(() => File, (file) => file.post)
+  files: File[];
 
   @OneToMany((type) => Comment, (comment) => comment.post)
   comments: Comment[];

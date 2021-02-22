@@ -5,7 +5,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Post } from '../entities/post.entity';
 import { HttpStatus } from '@nestjs/common';
 import { Like } from '../../like.entity';
-import { CreateLikeDto } from 'src/create-like-dto';
+import { CreateLikeDto } from '../../create-like-dto';
+import { CreatePostDto } from '../dto/create-post.dto';
 const newPosts = [
   {
     id: 1,
@@ -48,10 +49,11 @@ const newPosts = [
     deletedAt: null,
   },
 ];
-const createPostDto = {
+const createPostDto: CreatePostDto = {
   poster: 3,
   title: 'test title 1',
   content: 'test content 1',
+  category: 'board',
 };
 
 describe('PostsService', () => {
