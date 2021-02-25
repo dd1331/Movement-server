@@ -2,13 +2,14 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like.entity';
 import { CreateLikeDto } from '../create-like-dto';
 import { UsersService } from '../users/users.service';
 import { Category } from '../common/entities/category.entity';
 import { File } from '../files/entities/file.entity';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class PostsService {
@@ -57,8 +58,23 @@ export class PostsService {
     const posts = await this.postRepo.find({
       where,
       relations: ['poster', 'comments'],
+      order: {
+        createdAt: 'DESC',
+      },
     });
 
+    return posts;
+  }
+  async getPopularPosts(): Promise<Post[]> {
+    const posts = await this.postRepo.find({
+      where: {
+        createdAt: Between(dayjs().subtract(1, 'd').toDate(), dayjs().toDate()),
+      },
+      order: {
+        views: 'DESC',
+      },
+      take: 10,
+    });
     return posts;
   }
   async updatePost(updatePostDto: UpdatePostDto): Promise<Post> {

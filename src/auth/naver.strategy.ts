@@ -11,10 +11,8 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
       // tokenURL: '',
       clientID: 'ag_B0_vLXpvrgG1J5Upp',
     });
-    console.log('tsafds');
   }
   async validate(payload: any) {
-    console.log('payload', payload());
     return { userId: payload.sub, username: payload.username };
   }
 }

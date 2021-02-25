@@ -19,7 +19,6 @@ export class CommentsService {
     if (!post) return;
     const createdComment = await this.commentRepo.create(dto);
     await this.commentRepo.save(createdComment);
-    console.log(createdComment);
     return createdComment;
   }
   async readPostComments(postId: number): Promise<Comment[]> {

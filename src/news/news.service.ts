@@ -31,7 +31,6 @@ export class NewsService {
       const url =
         urlPrefix.replace('/news', '') +
         $(elem).find('.list-titles a').attr('href').trim();
-      console.log($(elem).find('.list-titles a').attr('href'));
       ulList[i] = {
         title: $(elem).find('strong').text(),
         image: imageArray.join(''),

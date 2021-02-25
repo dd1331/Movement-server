@@ -35,7 +35,6 @@ export class FilesService {
       type: file.type,
     };
     const createdFile = await this.createFile(uploadFileDto);
-    console.log('createdFile', createdFile);
     return createdFile;
   }
 

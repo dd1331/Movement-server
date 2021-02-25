@@ -14,7 +14,6 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
   @Post()
   create(@Body() dto: CreateCommentDto) {
-    console.log(dto);
     return this.commentsService.createComment(dto);
   }
   @Delete(':id')

@@ -20,7 +20,6 @@ export class AwsService {
       Body: file,
     };
     const res = await s3.upload(params).promise();
-    console.log('res', res.Location);
     return res.Location;
   }
 

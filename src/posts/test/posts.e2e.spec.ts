@@ -48,12 +48,13 @@ describe('Posts', () => {
 
     const [foundUser] = await usersService.findAll();
     user = foundUser ? foundUser : await usersService.create(newUser);
-    createPostDto: createPostDto = {
+    createPostDto = {
       poster: user.id,
-      title: 'test title 12',
+      title: 'test title 12 view',
       content: 'test content 1',
+      category: 'free',
     };
-    updatePostDto: updatePostDto = {
+    updatePostDto = {
       id: post.id,
       title: 'updated title',
       content: 'updated content',
@@ -74,6 +75,7 @@ describe('Posts', () => {
         poster: user.id,
         content: '',
         title: '',
+        category: 'free',
       };
       const { body } = await request(app.getHttpServer())
         .post('/posts/create')
@@ -109,6 +111,13 @@ describe('Posts', () => {
     });
     it('should throw an error if there is no post', async () => {
       // TODO write code
+    });
+  });
+
+  describe('GET getPopularPosts', () => {
+    it('should return popular posts', async () => {
+      const res = await request(app.getHttpServer()).get('/posts/popular');
+      console.log(res.body);
     });
   });
   describe('/PATCH updatePost', () => {
