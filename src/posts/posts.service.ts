@@ -103,20 +103,58 @@ export class PostsService {
     const like = await this.likeRepo.findOne({
       where: { post: { id: dto.postId }, user: { id: dto.userId } },
     });
-    if (like) {
-      like.isLike = like.isLike === dto.isLike ? null : dto.isLike;
-      await this.likeRepo.save(like);
-    }
     if (!like) {
-      const user = await this.usersService.findOne(dto.userId);
-      const createdLike = await this.likeRepo.create(dto);
-      createdLike.post = post;
-      createdLike.user = user;
-      await this.likeRepo.save(createdLike);
+      await this.createLike(dto, post);
+    }
+    if (like) {
+      await this.updateLikeCount(like, dto, post);
     }
     const likes = await this.likeRepo.find({
       where: { post: { id: dto.postId } },
     });
     return likes;
+  }
+  async updateLikeCount(like: Like, dto: CreateLikeDto, post: Post) {
+    const status: boolean | null = like.isLike;
+    if (status === null && dto.isLike) {
+      post.likeCount += 1;
+      like.isLike = dto.isLike;
+    }
+    if (status === null && !dto.isLike) {
+      post.dislikeCount += 1;
+      like.isLike = dto.isLike;
+    }
+    if (status === true && dto.isLike) {
+      post.likeCount -= 1;
+      like.isLike = null;
+    }
+    if (status === true && !dto.isLike) {
+      post.likeCount -= 1;
+      post.dislikeCount += 1;
+      like.isLike = dto.isLike;
+    }
+    if (status === false && dto.isLike) {
+      post.likeCount += 1;
+      post.dislikeCount -= 1;
+      like.isLike = dto.isLike;
+    }
+    if (status === false && !dto.isLike) {
+      post.dislikeCount -= 1;
+      like.isLike = null;
+    }
+    await this.likeRepo.save(like);
+    await this.postRepo.save(post);
+    return like;
+  }
+  async createLike(dto: CreateLikeDto, post) {
+    const user = await this.usersService.findOne(dto.userId);
+    if (dto.isLike) post.likeCount += 1;
+    if (!dto.isLike) post.dislikeCount += 1;
+    await this.postRepo.save(post);
+    const like = await this.likeRepo.create(dto);
+    like.post = post;
+    like.user = user;
+    await this.likeRepo.save(like);
+    return like;
   }
 }

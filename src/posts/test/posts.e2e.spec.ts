@@ -172,7 +172,7 @@ describe('Posts', () => {
       const createLikeDto: CreateLikeDto = {
         type: 'post',
         isLike: true,
-        postId: 232,
+        postId: 136,
         userId: 233,
       };
       const { body } = await request(app.getHttpServer())
@@ -185,8 +185,8 @@ describe('Posts', () => {
     it('should return created like obejct', async () => {
       const createLikeDto: CreateLikeDto = {
         type: 'post',
-        isLike: true,
-        postId: 50,
+        isLike: false,
+        postId: 136,
         userId: 233,
       };
       const { body } = await request(app.getHttpServer())

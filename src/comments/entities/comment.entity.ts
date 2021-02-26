@@ -8,11 +8,11 @@ export class Comment extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  postId: number;
+  // @Column()
+  // postId: number;
 
-  @Column()
-  commenterId: number;
+  // @Column()
+  // commenterId: number;
 
   @Column()
   content: string;

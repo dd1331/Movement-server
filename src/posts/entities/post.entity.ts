@@ -34,6 +34,12 @@ export class Post extends CommonEntity {
   @Column()
   category: string;
 
+  @Column({ default: 0, nullable: true, name: 'like_count' })
+  likeCount: number;
+
+  @Column({ default: 0, nullable: true, name: 'dislike_count' })
+  dislikeCount: number;
+
   // @ManyToMany(() => Category)
   // @JoinTable({ joinColumns: [{ name: 'category' }] })
   // categories: Category[];

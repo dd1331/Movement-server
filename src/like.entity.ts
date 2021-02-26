@@ -15,12 +15,6 @@ export class Like extends CommonEntity {
   id: number;
 
   @Column()
-  postId: number;
-
-  @Column()
-  userId: number;
-
-  @Column()
   type: string;
 
   @Column({ nullable: true })
