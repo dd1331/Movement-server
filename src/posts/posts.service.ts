@@ -68,7 +68,7 @@ export class PostsService {
   async getPopularPosts(): Promise<Post[]> {
     const posts = await this.postRepo.find({
       where: {
-        createdAt: Between(dayjs().subtract(1, 'd').toDate(), dayjs().toDate()),
+        createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
       },
       order: {
         views: 'DESC',
@@ -77,6 +77,20 @@ export class PostsService {
     });
     return posts;
   }
+  async getRecommendedPosts(): Promise<Post[]> {
+    const posts = await this.postRepo.find({
+      where: {
+        createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
+      },
+      order: {
+        likeCount: 'DESC',
+      },
+      relations: ['files'],
+      take: 6,
+    });
+    return posts;
+  }
+
   async updatePost(updatePostDto: UpdatePostDto): Promise<Post> {
     const { title, content } = updatePostDto;
     const existingPost = await this.readPost(updatePostDto.id);

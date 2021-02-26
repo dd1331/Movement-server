@@ -120,6 +120,13 @@ describe('Posts', () => {
       console.log(res.body);
     });
   });
+
+  describe('/GET getRecommendedPosts', () => {
+    it('should return posts ordered by likes', async () => {
+      const res = await request(app.getHttpServer()).get('/posts/recommended');
+      console.log(res.body);
+    });
+  });
   describe('/PATCH updatePost', () => {
     it('should return updated post object', async () => {
       const { body } = await request(app.getHttpServer())

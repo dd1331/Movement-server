@@ -30,6 +30,10 @@ export class PostsController {
   getPopularPosts() {
     return this.postsService.getPopularPosts();
   }
+  @Get('recommended')
+  getRecommendedPosts() {
+    return this.postsService.getRecommendedPosts();
+  }
 
   @Get(':id')
   readPost(@Param('id', ParseIntPipe) id: number) {
