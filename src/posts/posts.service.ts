@@ -39,7 +39,7 @@ export class PostsService {
   async readPost(id: number): Promise<Post> {
     //TODO exclude softdeleted likes
     const post = await this.postRepo.findOne(id, {
-      relations: ['poster', 'comments', 'comments.commenter', 'likes'],
+      relations: ['poster', 'comments', 'comments.commenter', 'likes', 'files'],
       withDeleted: false,
     });
     if (!post) {
@@ -73,7 +73,7 @@ export class PostsService {
       order: {
         views: 'DESC',
       },
-      take: 10,
+      take: 5,
     });
     return posts;
   }
@@ -91,14 +91,15 @@ export class PostsService {
     return posts;
   }
 
-  async updatePost(updatePostDto: UpdatePostDto): Promise<Post> {
-    const { title, content } = updatePostDto;
-    const existingPost = await this.readPost(updatePostDto.id);
+  async updatePost(dto: UpdatePostDto): Promise<Post> {
+    const { title, content } = dto;
+    const existingPost = await this.readPost(dto.id);
 
     if (!existingPost) return;
-
+    const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
     existingPost.title = title;
     existingPost.content = content;
+    existingPost.files = newFiles;
     const updatedPost = await this.postRepo.save(existingPost);
     return updatedPost;
   }
