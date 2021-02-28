@@ -33,6 +33,13 @@ export class UsersService {
     return users;
   }
 
+  async findWingmanUsers(): Promise<User[]> {
+    const users: User[] = await this.userRepo.find({
+      where: { role: 'wingman' },
+    });
+    return users;
+  }
+
   async findAllWithDeleted(): Promise<User[]> {
     const users: User[] = await this.userRepo.find({ withDeleted: true });
     return users;

@@ -18,6 +18,7 @@ import { NewsModule } from './news/news.module';
 import { FilesModule } from './files/files.module';
 import { AwsModule } from './aws/aws.module';
 import { File } from './files/entities/file.entity';
+import { WingmanModule } from './wingman/wingman.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { File } from './files/entities/file.entity';
     NewsModule,
     FilesModule,
     AwsModule,
+    WingmanModule,
   ],
   controllers: [
     AppController,

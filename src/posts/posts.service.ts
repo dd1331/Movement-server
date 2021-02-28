@@ -36,6 +36,13 @@ export class PostsService {
     await this.postRepo.save(newPost);
     return newPost;
   }
+  async createPostByWingman(dto: CreatePostDto): Promise<Post> {
+    const post: Post = await this.postRepo.create(dto);
+
+    await this.postRepo.save(post);
+
+    return post;
+  }
   async readPost(id: number): Promise<Post> {
     //TODO exclude softdeleted likes
     const post = await this.postRepo.findOne(id, {
