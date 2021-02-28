@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { User } from './users/entities/user.entity';
 import { Post } from './posts/entities/post.entity';
 import { Comment } from './comments/entities/comment.entity';
@@ -22,6 +23,7 @@ import { WingmanModule } from './wingman/wingman.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -30,6 +32,7 @@ import { WingmanModule } from './wingman/wingman.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
+      charset: 'utf8mb4',
       entities: [User, Post, Comment, Like, Category, File],
       synchronize: true,
       // logging: true,

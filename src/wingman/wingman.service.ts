@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateWingmanDto } from './dto/create-wingman.dto';
 import { UpdateWingmanDto } from './dto/update-wingman.dto';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { PostsService } from '../posts/posts.service';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
-import { Post } from '../posts/entities/post.entity';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class WingmanService {
@@ -15,11 +15,18 @@ export class WingmanService {
     private usersService: UsersService,
     private postsService: PostsService,
   ) {}
+  private readonly logger = new Logger(WingmanService.name);
+
   create(createWingmanDto: CreateWingmanDto) {
     return 'This action adds a new wingman';
   }
 
+  // @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_7PM)
   async crawlInstizFreeBoard() {
+    this.logger.debug(
+      `crawlInstizFreeBoard started ${WingmanService.name} ${Date.now()}`,
+    );
     const listUrl = 'https://www.instiz.net/name?category=1';
     const html = await this.getHtml(listUrl);
     const $ = cheerio.load(html.data);
@@ -32,9 +39,8 @@ export class WingmanService {
         const html = await this.getHtml(url);
         const $ = cheerio.load(html.data);
         const title = $('.tb_top').find('#nowsubject a').text().trim();
-        const createdAt = $('.tb_lr.minitext').find('span').attr('title');
         const content = $('.memo_content').text().trim();
-        const result = { title, createdAt, content };
+        const result = { title, content };
         return result;
       }),
     );
@@ -50,6 +56,7 @@ export class WingmanService {
       }),
     );
   }
+
   getUrlList($, $bodyList) {
     const urlPrefix = 'https://www.instiz.net';
     const urlList = [];

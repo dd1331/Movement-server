@@ -25,7 +25,7 @@ export class Post extends CommonEntity {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ type: 'longtext' })
   content: string;
 
   @Column({ default: 0, nullable: true })
