@@ -6,6 +6,7 @@ import { CreateCommentDto } from './dto/create-comment-dto';
 import { UpdateCommentDto } from './dto/update-comment-dto';
 import { Post } from '../posts/entities/post.entity';
 import { PostsService } from '../posts/posts.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CommentsService {
@@ -13,11 +14,15 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentRepo: Repository<Comment>,
     private readonly postsService: PostsService,
+    private readonly userService: UsersService,
   ) {}
   async createComment(dto: CreateCommentDto): Promise<Comment> {
     const post = await this.postsService.readPost(dto.postId);
     if (!post) return;
+    const user = await this.userService.findOne(dto.commenterId);
     const createdComment = await this.commentRepo.create(dto);
+    createdComment.post = post;
+    createdComment.commenter = user;
     await this.commentRepo.save(createdComment);
     return createdComment;
   }
@@ -47,6 +52,7 @@ export class CommentsService {
   }
 
   async deleteComment(commentId: number): Promise<Comment> {
+    console.log(commentId);
     const comment = await this.readComment(commentId);
     if (!comment) return;
     comment.deletedAt = new Date();

@@ -20,6 +20,9 @@ export class Like extends CommonEntity {
   @Column({ nullable: true })
   isLike: boolean;
 
+  @Column({ name: 'user_id' })
+  userId: number;
+
   @ManyToOne(() => Post, (post) => post.likes)
   @JoinColumn({ name: 'post_id' })
   post: Post;

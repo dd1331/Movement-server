@@ -30,6 +30,9 @@ export class User extends CommonEntity {
   @Column({ default: 'normal' })
   provider: string;
 
+  @Column()
+  avatar: string;
+
   @OneToMany((type) => Post, (post) => post.poster)
   posts: [Post];
 
