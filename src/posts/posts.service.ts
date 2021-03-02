@@ -61,10 +61,11 @@ export class PostsService {
   }
 
   async readAllPosts(category?: string): Promise<Post[]> {
+    console.log('category', category);
     const where = category ? { category } : null;
     const posts = await this.postRepo.find({
       where,
-      relations: ['poster', 'comments'],
+      relations: ['poster', 'comments', 'files'],
       order: {
         createdAt: 'DESC',
       },
@@ -72,11 +73,22 @@ export class PostsService {
 
     return posts;
   }
+  async getRecentPosts(): Promise<Post[]> {
+    const posts = await this.postRepo.find({
+      relations: ['poster', 'comments', 'files'],
+      take: 5,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    return posts;
+  }
   async getPopularPosts(): Promise<Post[]> {
     const posts = await this.postRepo.find({
       where: {
         createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
       },
+      relations: ['comments'],
       order: {
         views: 'DESC',
       },

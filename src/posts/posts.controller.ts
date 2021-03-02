@@ -26,6 +26,11 @@ export class PostsController {
     return this.postsService.readAllPosts(category);
   }
 
+  @Get('recent')
+  getRecentPosts() {
+    return this.postsService.getRecentPosts();
+  }
+
   @Get('popular')
   getPopularPosts() {
     return this.postsService.getPopularPosts();
