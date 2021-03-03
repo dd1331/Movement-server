@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../../app.module';
 import { CommentsService } from '../comments.service';
 import { CreateCommentDto } from '../dto/create-comment-dto';
+import { CreateChildCommentDto } from '../dto/create-child-comment-dto';
 
 describe('Posts', () => {
   let app: INestApplication;
@@ -33,6 +34,21 @@ describe('Posts', () => {
         .send(createCommentDto)
         .expect(HttpStatus.CREATED);
       expect(body.content).toBe(createCommentDto.content);
+    });
+  });
+  describe('CREATE childComment', () => {
+    it('create childComment', async () => {
+      const createChildCommentDto: CreateChildCommentDto = {
+        postId: 788,
+        commenterId: 243,
+        content: 'child2',
+        parentId: 97,
+      };
+      const res = await request(app.getHttpServer())
+        .post('/comments/create-child')
+        .send(createChildCommentDto);
+      console.log(res.body);
+      // await commentsService.createChildComment(createChildCommentDto);
     });
   });
 });

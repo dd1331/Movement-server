@@ -7,12 +7,16 @@ import { UpdateCommentDto } from './dto/update-comment-dto';
 import { Post } from '../posts/entities/post.entity';
 import { PostsService } from '../posts/posts.service';
 import { UsersService } from '../users/users.service';
+import { ChildComment } from './entities/child_comment.entity';
+import { CreateChildCommentDto } from './dto/create-child-comment-dto';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepo: Repository<Comment>,
+    @InjectRepository(ChildComment)
+    private readonly childcommentRepo: Repository<ChildComment>,
     private readonly postsService: PostsService,
     private readonly userService: UsersService,
   ) {}
@@ -25,6 +29,18 @@ export class CommentsService {
     createdComment.commenter = user;
     await this.commentRepo.save(createdComment);
     return createdComment;
+  }
+  async createChildComment(dto: CreateChildCommentDto): Promise<ChildComment> {
+    const childComment = await this.childcommentRepo.create(dto);
+    const parentComment = await this.readComment(dto.parentId);
+    const post = await this.postsService.readPost(dto.postId);
+    const commenter = await this.userService.findOne(dto.commenterId);
+    parentComment.childCount += 1;
+    await this.commentRepo.save(parentComment);
+    childComment.post = post;
+    childComment.commenter = commenter;
+    await this.childcommentRepo.save(childComment);
+    return childComment;
   }
   async readPostComments(postId: number): Promise<Comment[]> {
     const comments: Comment[] = await this.commentRepo.find({

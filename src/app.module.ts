@@ -20,6 +20,7 @@ import { FilesModule } from './files/files.module';
 import { AwsModule } from './aws/aws.module';
 import { File } from './files/entities/file.entity';
 import { WingmanModule } from './wingman/wingman.module';
+import { ChildComment } from './comments/entities/child_comment.entity';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { WingmanModule } from './wingman/wingman.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       charset: 'utf8mb4',
-      entities: [User, Post, Comment, Like, Category, File],
+      entities: [User, Post, Comment, Like, Category, File, ChildComment],
       synchronize: true,
       // logging: true,
       // logging: ['error', 'log'],
