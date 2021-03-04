@@ -41,8 +41,8 @@ describe('Posts', () => {
       const createChildCommentDto: CreateChildCommentDto = {
         postId: 788,
         commenterId: 243,
-        content: 'child2',
-        parentId: 97,
+        content: 'child98',
+        parentId: 98,
       };
       const res = await request(app.getHttpServer())
         .post('/comments/create-child')

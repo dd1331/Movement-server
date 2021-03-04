@@ -59,6 +59,13 @@ export class CommentsService {
     }
     return comment;
   }
+  async fetchChildComments(parentId: number) {
+    const comments = await this.childcommentRepo.find({
+      where: { parentId },
+      relations: ['commenter'],
+    });
+    return comments;
+  }
   async updateComment(dto: UpdateCommentDto): Promise<Comment> {
     const comment = await this.readComment(dto.id);
     if (!comment) return;
