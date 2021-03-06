@@ -75,11 +75,21 @@ export class CommentsService {
   }
 
   async deleteComment(commentId: number): Promise<Comment> {
-    console.log(commentId);
     const comment = await this.readComment(commentId);
     if (!comment) return;
     comment.deletedAt = new Date();
     await this.commentRepo.save(comment);
+    return comment;
+  }
+  async deleteChildComment(commentId: number): Promise<ChildComment> {
+    const comment = await this.childcommentRepo.findOne(commentId);
+    if (!comment) return;
+    const parent = await this.commentRepo.findOne(comment.parentId);
+
+    parent.childCount -= 1;
+    comment.deletedAt = new Date();
+    await this.commentRepo.save(parent);
+    await this.childcommentRepo.save(comment);
     return comment;
   }
 }

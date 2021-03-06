@@ -30,4 +30,8 @@ export class CommentsController {
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.commentsService.deleteComment(id);
   }
+  @Delete('child/:id')
+  deleteChild(@Param('id', ParseIntPipe) id: number) {
+    return this.commentsService.deleteChildComment(id);
+  }
 }
