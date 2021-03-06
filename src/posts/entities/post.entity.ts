@@ -11,6 +11,7 @@ import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../like.entity';
 import { Category } from '../../common/entities/category.entity';
 import { File } from '../../files/entities/file.entity';
+import { ChildComment } from 'src/comments/entities/child_comment.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -47,6 +48,9 @@ export class Post extends CommonEntity {
 
   @OneToMany((type) => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  @OneToMany((type) => ChildComment, (comment) => comment.post)
+  childComments: ChildComment[];
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];

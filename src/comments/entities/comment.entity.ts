@@ -29,10 +29,10 @@ export class Comment extends CommonEntity {
   @Column({ name: 'post_id' })
   postId: number;
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User, (user) => user.childComments)
   commenter: User;
 
-  @ManyToOne(() => Post, (post) => post.comments)
+  @ManyToOne(() => Post, (post) => post.childComments)
   @JoinColumn({ name: 'post_id' })
   post: Post;
 }

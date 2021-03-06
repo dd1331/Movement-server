@@ -1,4 +1,10 @@
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { CommonEntity } from '../../common.entity';
@@ -16,10 +22,14 @@ export class ChildComment extends CommonEntity {
   @Column({ default: 0, nullable: true })
   dislike: number;
 
+  @Column({ name: 'post_id' })
+  postId: number;
+
   @ManyToOne(() => User, (user) => user.comments)
   commenter: User;
 
   @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'post_id' })
   post: Post;
 
   @Column()

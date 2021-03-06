@@ -3,6 +3,7 @@ import { CommonEntity } from '../../common.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../like.entity';
+import { ChildComment } from 'src/comments/entities/child_comment.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -38,6 +39,9 @@ export class User extends CommonEntity {
 
   @OneToMany((type) => Comment, (comment) => comment.commenter)
   comments: [Comment];
+
+  @OneToMany((type) => ChildComment, (comment) => comment.commenter)
+  childComments: [ChildComment];
 
   @OneToMany((type) => Like, (like) => like.user)
   likes: [Like];
