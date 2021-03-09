@@ -8,8 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Comment } from '../../comments/entities/comment.entity';
-import { Like } from '../../like.entity';
-import { Category } from '../../common/entities/category.entity';
+import { Like } from '../../like/entities/like.entity';
 import { File } from '../../files/entities/file.entity';
 import { ChildComment } from 'src/comments/entities/child_comment.entity';
 

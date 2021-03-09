@@ -1,6 +1,6 @@
 export class CreateLikeDto {
   type: string;
   isLike: boolean;
-  postId: number;
+  targetId: number;
   userId: number;
 }

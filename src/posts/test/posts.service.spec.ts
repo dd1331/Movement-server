@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Post } from '../entities/post.entity';
 import { HttpStatus } from '@nestjs/common';
-import { Like } from '../../like.entity';
-import { CreateLikeDto } from '../../create-like-dto';
+import { Like } from '../../like/entities/like.entity';
+import { CreateLikeDto } from '../../like/dto/create-like-dto';
 import { CreatePostDto } from '../dto/create-post.dto';
 const newPosts = [
   {

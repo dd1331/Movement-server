@@ -12,7 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { APP_PIPE } from '@nestjs/core';
 import { CommentsModule } from './comments/comments.module';
-import { Like } from './like.entity';
+import { Like } from './like/entities/like.entity';
 import { Category } from './common/entities/category.entity';
 import { CommonModule } from './common/common.module';
 import { NewsModule } from './news/news.module';
@@ -21,6 +21,7 @@ import { AwsModule } from './aws/aws.module';
 import { File } from './files/entities/file.entity';
 import { WingmanModule } from './wingman/wingman.module';
 import { ChildComment } from './comments/entities/child_comment.entity';
+import { LikeModule } from './like/likes.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ChildComment } from './comments/entities/child_comment.entity';
     FilesModule,
     AwsModule,
     WingmanModule,
+    LikeModule,
   ],
   controllers: [
     AppController,

@@ -16,7 +16,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentRepo: Repository<Comment>,
     @InjectRepository(ChildComment)
-    private readonly childcommentRepo: Repository<ChildComment>,
+    private readonly childCommentRepo: Repository<ChildComment>,
     private readonly postsService: PostsService,
     private readonly userService: UsersService,
   ) {}
@@ -31,7 +31,7 @@ export class CommentsService {
     return createdComment;
   }
   async createChildComment(dto: CreateChildCommentDto): Promise<ChildComment> {
-    const childComment = await this.childcommentRepo.create(dto);
+    const childComment = await this.childCommentRepo.create(dto);
     const parentComment = await this.readComment(dto.parentId);
     const post = await this.postsService.readPost(dto.postId);
     const commenter = await this.userService.findOne(dto.commenterId);
@@ -39,12 +39,13 @@ export class CommentsService {
     await this.commentRepo.save(parentComment);
     childComment.post = post;
     childComment.commenter = commenter;
-    await this.childcommentRepo.save(childComment);
+    await this.childCommentRepo.save(childComment);
     return childComment;
   }
-  async readPostComments(postId: number): Promise<Comment[]> {
+  async getActiveComments(postId: number): Promise<Comment[]> {
     const comments: Comment[] = await this.commentRepo.find({
       where: { postId },
+      relations: ['commenter', 'likes'],
     });
     if (!comments) {
       throw new HttpException('댓글이 존재하지 않습니다', HttpStatus.NOT_FOUND);
@@ -59,8 +60,15 @@ export class CommentsService {
     }
     return comment;
   }
+  async readChildComment(commentId: number): Promise<ChildComment> {
+    const comment = await this.childCommentRepo.findOne(commentId);
+    if (!comment) {
+      throw new HttpException('댓글이 존재하지 않습니다', HttpStatus.NOT_FOUND);
+    }
+    return comment;
+  }
   async fetchChildComments(parentId: number) {
-    const comments = await this.childcommentRepo.find({
+    const comments = await this.childCommentRepo.find({
       where: { parentId },
       relations: ['commenter'],
     });
@@ -82,14 +90,14 @@ export class CommentsService {
     return comment;
   }
   async deleteChildComment(commentId: number): Promise<ChildComment> {
-    const comment = await this.childcommentRepo.findOne(commentId);
+    const comment = await this.childCommentRepo.findOne(commentId);
     if (!comment) return;
     const parent = await this.commentRepo.findOne(comment.parentId);
 
     parent.childCount -= 1;
     comment.deletedAt = new Date();
     await this.commentRepo.save(parent);
-    await this.childcommentRepo.save(comment);
+    await this.childCommentRepo.save(comment);
     return comment;
   }
 }

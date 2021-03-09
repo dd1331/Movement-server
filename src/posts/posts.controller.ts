@@ -11,11 +11,15 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { CreateLikeDto } from '../create-like-dto';
+import { CreateLikeDto } from '../like/dto/create-like-dto';
+import { LikesService } from 'src/like/likes.service';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly likesService: LikesService,
+  ) {}
 
   @Post('create')
   create(@Body() dto: CreatePostDto) {
@@ -56,10 +60,10 @@ export class PostsController {
   }
   @Post('like')
   likePost(@Body() dto: CreateLikeDto) {
-    return this.postsService.likeOrDislikePost(dto);
+    return this.likesService.likeOrDislike(dto);
   }
   @Post('dislike')
   dislikePost(@Body() dto: CreateLikeDto) {
-    return this.postsService.likeOrDislikePost(dto);
+    return this.likesService.likeOrDislike(dto);
   }
 }

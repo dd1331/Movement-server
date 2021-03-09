@@ -6,7 +6,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from '../posts/entities/post.entity';
-import { Like } from '../like.entity';
+import { Like } from '../like/entities/like.entity';
 import { File } from '../files/entities/file.entity';
 
 @Module({

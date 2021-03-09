@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../common.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
-import { Like } from '../../like.entity';
+import { Like } from '../../like/entities/like.entity';
 import { ChildComment } from 'src/comments/entities/child_comment.entity';
 
 @Entity()

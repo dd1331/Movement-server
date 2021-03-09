@@ -4,10 +4,9 @@ import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Repository, Between } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Like } from '../like.entity';
-import { CreateLikeDto } from '../create-like-dto';
+import { Like } from '../like/entities/like.entity';
+import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { UsersService } from '../users/users.service';
-import { Category } from '../common/entities/category.entity';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
 
@@ -132,10 +131,10 @@ export class PostsService {
   }
 
   async likeOrDislikePost(dto: CreateLikeDto): Promise<Like[]> {
-    const post = await this.readPost(dto.postId);
+    const post = await this.readPost(dto.targetId);
     if (!post) return;
     const like = await this.likeRepo.findOne({
-      where: { post: { id: dto.postId }, user: { id: dto.userId } },
+      where: { post: { id: dto.targetId }, user: { id: dto.userId } },
     });
     if (!like) {
       await this.createLike(dto, post);
@@ -144,7 +143,7 @@ export class PostsService {
       await this.updateLikeCount(like, dto, post);
     }
     const likes = await this.likeRepo.find({
-      where: { post: { id: dto.postId } },
+      where: { post: { id: dto.targetId } },
     });
     return likes;
   }

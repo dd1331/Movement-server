@@ -9,7 +9,7 @@ import { PostsService } from '../posts.service';
 import { Post } from '../entities/post.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
-import { CreateLikeDto } from '../../create-like-dto';
+import { CreateLikeDto } from '../../like/dto/create-like-dto';
 const newUser: CreateUserDto = {
   userId: 'test id 2',
   userName: 'test2',
