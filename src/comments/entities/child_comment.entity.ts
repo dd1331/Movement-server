@@ -34,7 +34,7 @@ export class ChildComment extends CommonEntity {
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
-  @OneToMany(() => Like, (like) => like.comment)
+  @OneToMany(() => Like, (like) => like.childComment)
   likes: Like[];
 
   @Column()

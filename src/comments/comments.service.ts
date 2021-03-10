@@ -70,7 +70,7 @@ export class CommentsService {
   async fetchChildComments(parentId: number) {
     const comments = await this.childCommentRepo.find({
       where: { parentId },
-      relations: ['commenter'],
+      relations: ['commenter', 'likes'],
     });
     return comments;
   }
