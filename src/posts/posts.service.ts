@@ -9,6 +9,7 @@ import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { UsersService } from '../users/users.service';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
+import { GetPostsDto } from './dto/get-posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -59,15 +60,18 @@ export class PostsService {
     return post;
   }
 
-  async readAllPosts(category?: string): Promise<Post[]> {
-    console.log('category', category);
-    const where = category ? { category } : null;
+  async readAllPosts(dto: GetPostsDto): Promise<Post[]> {
+    // TODO find better way of setting default when dto used
+    const take = dto.take ? dto.take : 20;
+    const where = dto.category ? { category: dto.category } : null;
     const posts = await this.postRepo.find({
       where,
       relations: ['poster', 'comments', 'files'],
       order: {
         createdAt: 'DESC',
       },
+      take,
+      skip: (dto.page - 1) * take,
     });
 
     return posts;

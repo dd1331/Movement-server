@@ -7,12 +7,14 @@ import {
   Patch,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
-import { LikesService } from 'src/like/likes.service';
+import { LikesService } from '../like/likes.service';
+import { GetPostsDto } from './dto/get-posts.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -25,9 +27,9 @@ export class PostsController {
   create(@Body() dto: CreatePostDto) {
     return this.postsService.createPost(dto);
   }
-  @Get('readAll/:category?')
-  readAllPosts(@Param('category') category: string) {
-    return this.postsService.readAllPosts(category);
+  @Get('readAll')
+  readAllPosts(@Query() dto: GetPostsDto) {
+    return this.postsService.readAllPosts(dto);
   }
 
   @Get('recent')
