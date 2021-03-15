@@ -12,6 +12,9 @@ import { LikesService } from '../like/likes.service';
 import { Comment } from '../comments/entities/comment.entity';
 import { ChildComment } from '../comments/entities/child_comment.entity';
 import { CommentsService } from '../comments/comments.service';
+import { HashtagsService } from '../hashTags/hashtags.service';
+import { Hashtag } from '../hashtags/entities/hashtag.entity';
+import { PostHashtag } from './entities/post_hashtag.entity';
 
 @Module({
   imports: [
@@ -23,10 +26,18 @@ import { CommentsService } from '../comments/comments.service';
       File,
       Comment,
       ChildComment,
+      Hashtag,
+      PostHashtag,
     ]),
   ],
   exports: [PostsService],
-  providers: [PostsService, UsersService, LikesService, CommentsService],
+  providers: [
+    PostsService,
+    UsersService,
+    LikesService,
+    CommentsService,
+    HashtagsService,
+  ],
   controllers: [PostsController],
 })
 export class PostsModule {}

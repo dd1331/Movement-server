@@ -7,9 +7,9 @@ export class GetPostsDto {
   // TODO check if query send values only in string foramt
   @IsOptional()
   @IsNumberString()
-  page: number;
+  page?: number = 1;
 
   @IsOptional()
   @IsNumberString()
-  take: number;
+  take?: number = 20;
 }

@@ -2,14 +2,16 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, Connection } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { UsersService } from '../users/users.service';
+import { HashtagsService } from '../hashtags/hashTags.service';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
 import { GetPostsDto } from './dto/get-posts.dto';
+import { PostHashtag } from './entities/post_hashtag.entity';
 
 @Injectable()
 export class PostsService {
@@ -17,19 +19,21 @@ export class PostsService {
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
     @InjectRepository(File) private readonly fileRepo: Repository<File>,
-    // @InjectRepository(Category)
-    // private readonly categoryRepo: Repository<Category>,
     private usersService: UsersService,
+    private hashTagsService: HashtagsService,
   ) {}
   async createPost(dto: CreatePostDto): Promise<Post> {
     const newPost = await this.postRepo.create(dto);
     if (!newPost) {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
     }
-    // const category = await this.categoryRepo.findOne({
-    //   where: { title: dto.category },
-    // });
-    // newPost.category = [category];
+    // TODO add to other methods
+    const postHashtags: PostHashtag[] = await this.hashTagsService.create(
+      newPost,
+      dto,
+    );
+
+    newPost.postHashtags = postHashtags;
     // const file = await this.fileRepo.create({ dto.location });
     const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
     newPost.files = newFiles;

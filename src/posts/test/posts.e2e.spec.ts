@@ -10,6 +10,7 @@ import { Post } from '../entities/post.entity';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { CreateLikeDto } from '../../like/dto/create-like-dto';
+import { GetPostsDto } from '../dto/get-posts.dto';
 const newUser: CreateUserDto = {
   userId: 'test id 2',
   userName: 'test2',
@@ -24,6 +25,9 @@ describe('Posts', () => {
   let post: Post;
   let createPostDto: CreatePostDto;
   let updatePostDto: UpdatePostDto;
+  const dto: GetPostsDto = {
+    category: 'free',
+  };
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -43,7 +47,7 @@ describe('Posts', () => {
     await app.close();
   });
   beforeEach(async () => {
-    const [foundPost] = await postsService.readAllPosts();
+    const [foundPost] = await postsService.readAllPosts(dto);
     post = foundPost ? foundPost : await postsService.createPost(createPostDto);
 
     const [foundUser] = await usersService.findAll();
@@ -69,6 +73,16 @@ describe('Posts', () => {
       expect(body.title).toBe(createPostDto.title);
       expect(body.content).toBe(createPostDto.content);
       expect(body.poster).toBe(createPostDto.poster);
+    });
+    it('hashtag', async () => {
+      const dtoWithHashTag: CreatePostDto = {
+        ...createPostDto,
+        hashtags: ['test', 'test2'],
+      };
+      const { body } = await request(app.getHttpServer())
+        .post('/posts/create')
+        .send(dtoWithHashTag);
+      console.log(body);
     });
     it('should throw an error if values are not valid', async () => {
       const invalidCreatePostDto: CreatePostDto = {
@@ -103,7 +117,7 @@ describe('Posts', () => {
   });
   describe('/GET readAllPosts', () => {
     it('should return post array', async () => {
-      const posts = await postsService.readAllPosts();
+      const posts = await postsService.readAllPosts(dto);
       const { body } = await request(app.getHttpServer())
         .get('/posts')
         .expect(HttpStatus.OK);
@@ -179,7 +193,7 @@ describe('Posts', () => {
       const createLikeDto: CreateLikeDto = {
         type: 'post',
         isLike: true,
-        postId: 136,
+        targetId: 136,
         userId: 233,
       };
       const { body } = await request(app.getHttpServer())
@@ -193,7 +207,7 @@ describe('Posts', () => {
       const createLikeDto: CreateLikeDto = {
         type: 'post',
         isLike: false,
-        postId: 136,
+        targetId: 136,
         userId: 233,
       };
       const { body } = await request(app.getHttpServer())

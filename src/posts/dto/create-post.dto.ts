@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsInt, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsInt, IsOptional, IsArray } from 'class-validator';
 import { UpdateFileDto } from '../../files/dto/update-file.dto';
 
 export class CreatePostDto {
@@ -19,4 +19,8 @@ export class CreatePostDto {
 
   @IsOptional()
   fileId?: string;
+
+  @IsOptional()
+  @IsArray()
+  hashtags?: string[];
 }

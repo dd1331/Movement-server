@@ -8,10 +8,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from '../posts/entities/post.entity';
 import { Like } from '../like/entities/like.entity';
 import { File } from '../files/entities/file.entity';
+import { HashtagsService } from '../hashtags/hashTags.service';
+import { Hashtag } from '../hashtags/entities/hashtag.entity';
+import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Post, Like, File])],
+  imports: [
+    TypeOrmModule.forFeature([User, Post, Like, File, Hashtag, PostHashtag]),
+  ],
   controllers: [WingmanController],
-  providers: [WingmanService, UsersService, PostsService],
+  providers: [WingmanService, UsersService, PostsService, HashtagsService],
 })
 export class WingmanModule {}

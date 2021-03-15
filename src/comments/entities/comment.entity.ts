@@ -9,7 +9,7 @@ import {
 import { CommonEntity } from '../../common.entity';
 import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
-import { Like } from 'src/like/entities/like.entity';
+import { Like } from '../../like/entities/like.entity';
 
 @Entity()
 export class Comment extends CommonEntity {

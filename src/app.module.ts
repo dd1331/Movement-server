@@ -22,6 +22,9 @@ import { File } from './files/entities/file.entity';
 import { WingmanModule } from './wingman/wingman.module';
 import { ChildComment } from './comments/entities/child_comment.entity';
 import { LikeModule } from './like/likes.module';
+import { HashtagsModule } from './hashtags/hashtags.module';
+import { Hashtag } from './hashtags/entities/hashtag.entity';
+import { PostHashtag } from './posts/entities/post_hashtag.entity';
 
 @Module({
   imports: [
@@ -35,7 +38,17 @@ import { LikeModule } from './like/likes.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       charset: 'utf8mb4',
-      entities: [User, Post, Comment, Like, Category, File, ChildComment],
+      entities: [
+        User,
+        Post,
+        Comment,
+        Like,
+        Category,
+        File,
+        ChildComment,
+        Hashtag,
+        PostHashtag,
+      ],
       synchronize: true,
       // logging: true,
       // logging: ['error', 'log'],
@@ -50,6 +63,7 @@ import { LikeModule } from './like/likes.module';
     AwsModule,
     WingmanModule,
     LikeModule,
+    HashtagsModule,
   ],
   controllers: [
     AppController,

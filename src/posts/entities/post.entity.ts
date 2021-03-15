@@ -10,7 +10,8 @@ import { User } from '../../users/entities/user.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../like/entities/like.entity';
 import { File } from '../../files/entities/file.entity';
-import { ChildComment } from 'src/comments/entities/child_comment.entity';
+import { ChildComment } from '../../comments/entities/child_comment.entity';
+import { PostHashtag } from './post_hashtag.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -38,10 +39,6 @@ export class Post extends CommonEntity {
   @Column({ default: 0, nullable: true, name: 'dislike_count' })
   dislikeCount: number;
 
-  // @ManyToMany(() => Category)
-  // @JoinTable({ joinColumns: [{ name: 'category' }] })
-  // categories: Category[];
-
   @OneToMany(() => File, (file) => file.post)
   files: File[];
 
@@ -53,4 +50,7 @@ export class Post extends CommonEntity {
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
+
+  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.post)
+  postHashtags: PostHashtag[];
 }

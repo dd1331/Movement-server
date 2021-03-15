@@ -9,7 +9,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { CommonEntity } from '../../common.entity';
-import { Like } from 'src/like/entities/like.entity';
+import { Like } from '../../like/entities/like.entity';
 @Entity()
 export class ChildComment extends CommonEntity {
   @PrimaryGeneratedColumn()
