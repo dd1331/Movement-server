@@ -21,8 +21,8 @@ export class HashtagsController {
   }
 
   @Get()
-  findAll() {
-    return this.hashtagsService.findAll();
+  getPopularHashtags() {
+    return this.hashtagsService.getPopularHashtags();
   }
 
   @Get(':id')

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { CommonEntity } from '../../common.entity';
 import { Post } from './post.entity';
 import { Hashtag } from '../../hashtags/entities/hashtag.entity';
@@ -12,5 +12,6 @@ export class PostHashtag extends CommonEntity {
   post: Post;
 
   @ManyToOne((type) => Hashtag, (hashtag) => hashtag.postHashtags)
+  @JoinColumn({ name: 'hashtag_id' })
   hashtag: Hashtag;
 }

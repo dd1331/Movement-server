@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { UpdateHashtagDto } from './dto/update-hashtag.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hashtag } from './entities/hashtag.entity';
-import { Repository, In } from 'typeorm';
+import { Repository, In, getRepository } from 'typeorm';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { Post } from '../posts/entities/post.entity';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class HashtagsService {
@@ -42,8 +43,35 @@ export class HashtagsService {
     return postHashtags;
   }
 
-  findAll() {
-    return `This action returns all hashtags`;
+  async getPopularHashtags(): Promise<Hashtag[]> {
+    const popularPostHashtags = await this.getCountsAndHashtagIds();
+    const popularHashTags = [];
+    // TODO check which is a better way of getting pupular hashtags either using IN funcion or separately
+    await Promise.all(
+      popularPostHashtags.map(async (postHashtag) => {
+        const parsedPostHashtag = JSON.parse(JSON.stringify(postHashtag));
+        const hashtag = await this.hashtagRepo.findOne(
+          parsedPostHashtag.hashtagId,
+        );
+        popularHashTags.push(hashtag);
+      }),
+    );
+    return popularHashTags;
+  }
+  async getCountsAndHashtagIds() {
+    return await getRepository(PostHashtag)
+      .createQueryBuilder('postHashtag')
+      .select('COUNT(postHashtag.hashtag_id)', 'count')
+      .addSelect('postHashtag.hashtag_id', 'hashtagId')
+      // TODO apply where clause conditionally
+      // .where('postHashtag.created_at Between :before and :after', {
+      //   before: dayjs().subtract(7, 'd').toDate(),
+      //   after: dayjs().toDate(),
+      // })
+      .groupBy('hashtag_id')
+      .orderBy('count', 'DESC')
+      .limit(10)
+      .getRawMany();
   }
 
   findOne(id: number) {

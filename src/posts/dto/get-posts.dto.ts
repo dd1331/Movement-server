@@ -5,11 +5,12 @@ export class GetPostsDto {
   @IsString()
   category: string;
   // TODO check if query send values only in string foramt
+  // how to set default value for dto
   @IsOptional()
   @IsNumberString()
-  page?: number = 1;
+  page?: number;
 
   @IsOptional()
   @IsNumberString()
-  take?: number = 20;
+  take?: number;
 }
