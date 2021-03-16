@@ -54,8 +54,8 @@ describe('Posts', () => {
     user = foundUser ? foundUser : await usersService.create(newUser);
     createPostDto = {
       poster: user.id,
-      title: 'test title 12 view',
-      content: 'test content 1',
+      title: '트렌드 test',
+      content: 'trend content 1',
       category: 'free',
     };
     updatePostDto = {
@@ -77,7 +77,7 @@ describe('Posts', () => {
     it('hashtag', async () => {
       const dtoWithHashTag: CreatePostDto = {
         ...createPostDto,
-        hashtags: ['test', 'test2'],
+        hashtags: ['트렌드1', '트렌드5'],
       };
       const { body } = await request(app.getHttpServer())
         .post('/posts/create')

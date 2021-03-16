@@ -34,7 +34,7 @@ export class HashtagsService {
       hashtags.map(async (hashtag) => {
         const postHashtag: PostHashtag = await this.postHashtagRepo.create();
         // TODO check circular error. it only works when it is saved by post
-        // postHashtag.post = newPost;
+        postHashtag.post = newPost;
         postHashtag.hashtag = hashtag;
         await this.postHashtagRepo.save(postHashtag);
         return postHashtag;
@@ -65,7 +65,6 @@ export class HashtagsService {
       .addSelect('postHashtag.hashtag_id', 'hashtagId')
       // TODO apply where clause conditionally
       // .where('postHashtag.created_at Between :before and :after', {
-      //   before: dayjs().subtract(7, 'd').toDate(),
       //   after: dayjs().toDate(),
       // })
       .groupBy('hashtag_id')
@@ -74,8 +73,12 @@ export class HashtagsService {
       .getRawMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hashtag`;
+  async getPostIdsByHashtag(hashtagId: number): Promise<number[]> {
+    const postHastags: PostHashtag[] = await this.postHashtagRepo.find({
+      where: { hashtagId },
+    });
+    const postIds = postHastags.map((postHastag) => postHastag.postId);
+    return postIds;
   }
 
   update(id: number, updateHashtagDto: UpdateHashtagDto) {

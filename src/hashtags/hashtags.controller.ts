@@ -20,23 +20,23 @@ export class HashtagsController {
     // return this.hashtagsService.create(createHashtagDto);
   }
 
-  @Get()
+  @Get('popular')
   getPopularHashtags() {
     return this.hashtagsService.getPopularHashtags();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.hashtagsService.findOne(+id);
+    // return this.hashtagsService.findOne(+id);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateHashtagDto: UpdateHashtagDto) {
-    return this.hashtagsService.update(+id, updateHashtagDto);
+    // return this.hashtagsService.update(+id, updateHashtagDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.hashtagsService.remove(+id);
+    // return this.hashtagsService.remove(+id);
   }
 }

@@ -13,4 +13,8 @@ export class GetPostsDto {
   @IsOptional()
   @IsNumberString()
   take?: number;
+
+  @IsOptional()
+  @IsNumberString()
+  hashtagId?: number;
 }

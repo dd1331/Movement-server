@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Repository, Between, Connection } from 'typeorm';
+import { Repository, Between, Connection, In } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
@@ -24,16 +24,13 @@ export class PostsService {
   ) {}
   async createPost(dto: CreatePostDto): Promise<Post> {
     const newPost = await this.postRepo.create(dto);
+    await this.postRepo.save(newPost);
     if (!newPost) {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
     }
     // TODO add to other methods
-    const postHashtags: PostHashtag[] = await this.hashTagsService.create(
-      newPost,
-      dto,
-    );
+    await this.hashTagsService.create(newPost, dto);
 
-    newPost.postHashtags = postHashtags;
     // const file = await this.fileRepo.create({ dto.location });
     const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
     newPost.files = newFiles;
@@ -63,11 +60,17 @@ export class PostsService {
     await this.postRepo.save(post);
     return post;
   }
-
   async readAllPosts(dto: GetPostsDto): Promise<Post[]> {
     // TODO find better way of setting default when dto used
     const take = dto.take ? dto.take : 20;
-    const where = dto.category ? { category: dto.category } : null;
+    const where = dto.category ? { category: dto.category } : {};
+    if (dto.hashtagId) {
+      const postIds: number[] = await this.hashTagsService.getPostIdsByHashtag(
+        dto.hashtagId,
+      );
+      where['id'] = In(postIds);
+    }
+
     const posts = await this.postRepo.find({
       where,
       relations: ['poster', 'comments', 'files'],

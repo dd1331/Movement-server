@@ -24,5 +24,9 @@ describe('Posts', () => {
       const res = await request(app.getHttpServer()).get('/hashtags');
       console.log(res.body);
     });
+    it('test2', async () => {
+      const res = await hashtagsService.getPostIdsByHashtag(1);
+      console.log(res);
+    });
   });
 });
