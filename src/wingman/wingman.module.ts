@@ -11,10 +11,12 @@ import { File } from '../files/entities/file.entity';
 import { HashtagsService } from '../hashtags/hashTags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
+import { PostsModule } from 'src/posts/posts.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Post, Like, File, Hashtag, PostHashtag]),
+    PostsModule,
   ],
   controllers: [WingmanController],
   providers: [WingmanService, UsersService, PostsService, HashtagsService],

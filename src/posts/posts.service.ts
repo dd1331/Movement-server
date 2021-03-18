@@ -8,10 +8,10 @@ import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { UsersService } from '../users/users.service';
 import { HashtagsService } from '../hashtags/hashTags.service';
+import { CacheService } from '../cache/cache.service';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
 import { GetPostsDto } from './dto/get-posts.dto';
-import { PostHashtag } from './entities/post_hashtag.entity';
 
 @Injectable()
 export class PostsService {
@@ -21,6 +21,7 @@ export class PostsService {
     @InjectRepository(File) private readonly fileRepo: Repository<File>,
     private usersService: UsersService,
     private hashTagsService: HashtagsService,
+    private cacheService: CacheService,
   ) {}
   async createPost(dto: CreatePostDto): Promise<Post> {
     const newPost = await this.postRepo.create(dto);
@@ -107,6 +108,9 @@ export class PostsService {
     return posts;
   }
   async getRecommendedPosts(): Promise<Post[]> {
+    const cashedPosts: Post[] = await this.cacheService.get('recommendedPosts');
+    if (cashedPosts) return cashedPosts;
+
     const posts = await this.postRepo.find({
       where: {
         createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
@@ -117,6 +121,7 @@ export class PostsService {
       relations: ['files'],
       take: 6,
     });
+    await this.cacheService.set('recommendedPosts', posts);
     return posts;
   }
 
