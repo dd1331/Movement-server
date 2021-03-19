@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
-import { Common } from '../../common/entities/common.entity';
+import { CommonEntity } from '../../common.entity';
 
 @Entity()
-export class File extends Common {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class File extends CommonEntity {
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @Column()
   url: string;

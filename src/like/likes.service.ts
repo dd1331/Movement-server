@@ -121,7 +121,7 @@ export class LikesService {
   }
   async getTargetEntity(dto: CreateLikeDto) {
     if (dto.type === POST) {
-      return await this.postsService.readPost(dto.targetId);
+      return await this.postsService.getPost(dto.targetId);
     }
     if (dto.type === COMMENT) {
       return await this.commentsService.readComment(dto.targetId);

@@ -1,9 +1,17 @@
-import { IsNotEmpty, IsInt, IsOptional, IsArray } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsInt,
+  IsOptional,
+  IsArray,
+  IsNumberString,
+  IsString,
+} from 'class-validator';
 import { UpdateFileDto } from '../../files/dto/update-file.dto';
 
 export class CreatePostDto {
-  @IsInt()
-  poster: number;
+  // @IsInt()
+  @IsString()
+  poster: string;
 
   @IsNotEmpty()
   title: string;

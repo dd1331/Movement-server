@@ -12,8 +12,8 @@ import { CommonEntity } from '../../common.entity';
 import { Like } from '../../like/entities/like.entity';
 @Entity()
 export class ChildComment extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @Column()
   content: string;

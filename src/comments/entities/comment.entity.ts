@@ -13,8 +13,8 @@ import { Like } from '../../like/entities/like.entity';
 
 @Entity()
 export class Comment extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @Column()
   content: string;

@@ -7,8 +7,8 @@ import { ChildComment } from '../../comments/entities/child_comment.entity';
 
 @Entity()
 export class User extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @Column({ unique: true, name: 'user_id' })
   userId: string;

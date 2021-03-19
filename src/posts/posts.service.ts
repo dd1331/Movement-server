@@ -25,17 +25,22 @@ export class PostsService {
   ) {}
   async createPost(dto: CreatePostDto): Promise<Post> {
     const newPost = await this.postRepo.create(dto);
+
     await this.postRepo.save(newPost);
+
     if (!newPost) {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
     }
     // TODO add to other methods
-    await this.hashTagsService.create(newPost, dto);
+    if (dto.hashtags) await this.hashTagsService.create(newPost, dto);
 
-    // const file = await this.fileRepo.create({ dto.location });
-    const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
-    newPost.files = newFiles;
+    if (dto.fileId) {
+      const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
+      newPost.files = newFiles;
+    }
+
     await this.postRepo.save(newPost);
+
     return newPost;
   }
   async createPostByWingman(dto: CreatePostDto): Promise<Post> {
@@ -45,11 +50,10 @@ export class PostsService {
 
     return post;
   }
-  async readPost(id: number): Promise<Post> {
+  async getPost(id: number): Promise<Post> {
     //TODO exclude softdeleted likes
     const post = await this.postRepo.findOne(id, {
       relations: ['poster', 'comments', 'comments.commenter', 'likes', 'files'],
-      withDeleted: false,
     });
     if (!post) {
       throw new HttpException(
@@ -57,9 +61,13 @@ export class PostsService {
         HttpStatus.NOT_FOUND,
       );
     }
-    post.views += 1;
     await this.postRepo.save(post);
     return post;
+  }
+  async readPost(id: number): Promise<Post> {
+    const post = await this.postRepo.findOne(id);
+    post.views += 1;
+    return await this.postRepo.save(post);
   }
   async readAllPosts(dto: GetPostsDto): Promise<Post[]> {
     // TODO find better way of setting default when dto used
@@ -131,7 +139,7 @@ export class PostsService {
 
   async updatePost(dto: UpdatePostDto): Promise<Post> {
     const { title, content } = dto;
-    const existingPost = await this.readPost(dto.id);
+    const existingPost = await this.getPost(dto.id);
 
     if (!existingPost) return;
     const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
@@ -143,7 +151,7 @@ export class PostsService {
   }
   async deletePost(postId: number): Promise<Post> {
     // TODO softdelete related comments
-    const post = await this.readPost(postId);
+    const post = await this.getPost(postId);
     if (!post) return;
     post.deletedAt = new Date();
     await this.postRepo.save(post);
@@ -151,7 +159,7 @@ export class PostsService {
   }
 
   async likeOrDislikePost(dto: CreateLikeDto): Promise<Like[]> {
-    const post = await this.readPost(dto.targetId);
+    const post = await this.getPost(dto.targetId);
     if (!post) return;
     const like = await this.likeRepo.findOne({
       where: { post: { id: dto.targetId }, user: { id: dto.userId } },

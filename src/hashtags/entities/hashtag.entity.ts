@@ -4,8 +4,8 @@ import { PostHashtag } from '../../posts/entities/post_hashtag.entity';
 
 @Entity()
 export class Hashtag extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @Column({ unique: true })
   title: string;

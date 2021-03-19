@@ -11,8 +11,8 @@ import { Hashtag } from '../../hashtags/entities/hashtag.entity';
 
 @Entity()
 export class PostHashtag extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @Column({ name: 'hashtag_id' })
   hashtagId: number;

@@ -121,14 +121,14 @@ describe('PostsService', () => {
   });
   describe('READ', () => {
     it('should be defined', () => {
-      expect(service.readPost).toBeDefined();
-      expect(typeof service.readPost).toBe('function');
+      expect(service.getPost).toBeDefined();
+      expect(typeof service.getPost).toBe('function');
       expect(service.readAllPosts).toBeDefined();
       expect(typeof service.readAllPosts).toBe('function');
     });
     it('should return a post object', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(newPosts[0]);
-      const res = await service.readPost(3);
+      const res = await service.getPost(3);
       expect(res).toStrictEqual(newPosts[0]);
     });
     it('should return post objects', async () => {
@@ -139,7 +139,7 @@ describe('PostsService', () => {
     it('should throw an error if there is no data found', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(null);
       try {
-        await service.readPost(5);
+        await service.getPost(5);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.NOT_FOUND);
         expect(error.message).toBe('존재하지 않는 게시글입니다');
@@ -160,7 +160,7 @@ describe('PostsService', () => {
     it('should throw an error if it is a deleted post', async () => {
       (repo.findOne as jest.Mock).mockReturnValue(null);
       try {
-        await service.readPost(newPosts[1].id);
+        await service.getPost(newPosts[1].id);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.NOT_FOUND);
         expect(error.message).toBe('존재하지 않는 게시글입니다');

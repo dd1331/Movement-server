@@ -15,11 +15,11 @@ import { PostHashtag } from './post_hashtag.entity';
 
 @Entity()
 export class Post extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @ManyToOne((type) => User, (user) => user.posts)
-  poster: number;
+  poster: string;
 
   @Column()
   title: string;

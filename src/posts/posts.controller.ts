@@ -25,6 +25,7 @@ export class PostsController {
 
   @Post('create')
   create(@Body() dto: CreatePostDto) {
+    console.log('doto', dto);
     return this.postsService.createPost(dto);
   }
   @Get('readAll')
@@ -47,8 +48,8 @@ export class PostsController {
   }
 
   @Get(':id')
-  readPost(@Param('id', ParseIntPipe) id: number) {
-    return this.postsService.readPost(id);
+  getPost(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.getPost(id);
   }
 
   @Patch()
