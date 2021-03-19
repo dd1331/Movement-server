@@ -1,4 +1,11 @@
-import { Controller, UseGuards, Post, Request, Body } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Post,
+  Request,
+  Body,
+  HttpCode,
+} from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
 import { User } from '../users/entities/user.entity';
@@ -11,9 +18,10 @@ export class AuthController {
   async login(@Request() req) {
     return await this.authService.login(req.user);
   }
-
   @Post('naver')
-  async naver(@Body('id') id: string): Promise<User> {
+  @HttpCode(200)
+  //TODO set HttpCode dynamically?
+  async loginWithNaver(@Body('id') id: string): Promise<User> {
     return await this.authService.loginWithNaver(id);
   }
 }

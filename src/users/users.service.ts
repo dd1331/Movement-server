@@ -72,26 +72,6 @@ export class UsersService {
   async findOneByName(name: string) {
     return this.users.find((user) => user.username === name);
   }
-  ///temp///
-
-  async findOneByNaver(naverId: string) {
-    return await this.userRepo.findOne({
-      where: { provider: 'naver', naverId },
-    });
-  }
-  async signupWithSns(naverId: string, provider: string): Promise<User> {
-    const createUserDto: CreateUserDto = {
-      provider: provider,
-      password: 'randomString',
-      phone: 'randomPhone',
-      userId: 'randomString',
-      userName: 'randomString',
-    };
-    if (provider === 'naver') createUserDto['naverId'] = naverId;
-    const user = await this.userRepo.create(createUserDto);
-
-    return await this.userRepo.save(user);
-  }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);

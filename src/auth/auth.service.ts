@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {} //readonly?
@@ -23,11 +27,38 @@ export class AuthService {
     return { accessToken: this.jwtService.sign(payload) };
   }
   async loginWithNaver(id: string): Promise<User> {
-    const user = await this.usersService.findOneByNaver(id);
+    const user = await this.getUserBySocial(id, 'naver', 'naverId');
+
     if (!user) {
-      return await this.usersService.signupWithSns(id, 'naver');
+      return await this.signupWithSns(id, 'naver', 'naverId');
     }
     return user;
+  }
+
+  async getUserBySocial(id: string, provider: string, socialId: string) {
+    const where = { provider, [socialId]: id };
+
+    return await this.userRepo.findOne({
+      where,
+    });
+  }
+
+  async signupWithSns(
+    id: string,
+    provider: string,
+    socialId: string,
+  ): Promise<User> {
+    const createUserDto: CreateUserDto = {
+      provider: provider,
+      password: 'randomString',
+      phone: 'randomPhone',
+      userId: 'randomString',
+      userName: 'randomString',
+      [socialId]: id,
+    };
+    const user = await this.userRepo.create(createUserDto);
+
+    return await this.userRepo.save(user);
   }
   // async loginWithNaver() {
   //   const test = new NaverStrategy();
@@ -42,7 +73,7 @@ export class AuthService {
   //     },
   //     async (accessToken, refreshToken, profile, done) => {
   //       // console.log()
-  //       const user = await this.usersService.findOneByNaver(profile.id);
+  //       const user = await this.usersService.getUserBySocial(profile.id);
   //       console.log(user);
   //       // User.findOne(
   //       //   {

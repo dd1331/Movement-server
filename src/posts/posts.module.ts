@@ -15,7 +15,7 @@ import { CommentsService } from '../comments/comments.service';
 import { HashtagsService } from '../hashTags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from './entities/post_hashtag.entity';
-import { RedisCacheModule } from 'src/cache/cache.module';
+import { RedisCacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [

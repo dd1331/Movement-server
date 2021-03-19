@@ -31,7 +31,7 @@ export class User extends CommonEntity {
   @Column({ default: 'normal' })
   provider: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
 
   @OneToMany((type) => Post, (post) => post.poster)
