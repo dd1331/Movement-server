@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Repository, Between, Connection, In } from 'typeorm';
+import { Repository, Between, Connection, In, FindManyOptions } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
@@ -85,43 +85,47 @@ export class PostsService {
     return posts;
   }
   async getRecentPosts(): Promise<Post[]> {
-    const posts = await this.postRepo.find({
+    const findOptions: FindManyOptions<Post> = {
       relations: ['poster', 'comments', 'files'],
       take: 5,
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-    return posts;
+      order: { createdAt: 'DESC' },
+    };
+    return await this.getPosts('recommendedPosts', findOptions);
   }
   async getPopularPosts(): Promise<Post[]> {
-    const posts = await this.postRepo.find({
+    const findOptions: FindManyOptions<Post> = {
       where: {
         createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
       },
       relations: ['comments'],
-      order: {
-        views: 'DESC',
-      },
+      order: { views: 'DESC' },
       take: 5,
-    });
-    return posts;
+    };
+    return await this.getPosts('popularPosts', findOptions);
   }
   async getRecommendedPosts(): Promise<Post[]> {
-    const cashedPosts: Post[] = await this.cacheService.get('recommendedPosts');
-    if (cashedPosts) return cashedPosts;
-
-    const posts = await this.postRepo.find({
+    const findOptions: FindManyOptions<Post> = {
       where: {
         createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
       },
-      order: {
-        likeCount: 'DESC',
-      },
+      order: { likeCount: 'DESC' },
       relations: ['files'],
       take: 6,
-    });
-    await this.cacheService.set('recommendedPosts', posts);
+    };
+    return await this.getPosts('recommendedPosts', findOptions);
+  }
+  async getPosts(
+    key: string,
+    findOptions: FindManyOptions<Post>,
+  ): Promise<Post[]> {
+    const cashedPosts: Post[] = await this.cacheService.get(key);
+
+    if (cashedPosts) return cashedPosts;
+
+    const posts = await this.postRepo.find(findOptions);
+
+    await this.cacheService.set(key, posts);
+
     return posts;
   }
 

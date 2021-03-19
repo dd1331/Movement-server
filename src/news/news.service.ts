@@ -4,15 +4,21 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NewsDto } from './dto/news-dto';
+import { CacheService } from '../cache/cache.service';
+import { News } from './entities/news.entity';
 
 @Injectable()
 export class NewsService {
+  constructor(private cacheService: CacheService) {}
   create(createNewsDto: CreateNewsDto) {
     return 'This action adds a new news';
   }
 
   async findAll(): Promise<NewsDto[]> {
-    const ulList: NewsDto[] = [];
+    const cachedNews: NewsDto[] = await this.cacheService.get('news');
+    if (cachedNews) return cachedNews;
+
+    const news: NewsDto[] = [];
     const html = await this.getHtml();
     const $ = cheerio.load(html.data);
     const $bodyList = $('section.article-list-content').children(
@@ -31,7 +37,7 @@ export class NewsService {
       const url =
         urlPrefix.replace('/news', '') +
         $(elem).find('.list-titles a').attr('href').trim();
-      ulList[i] = {
+      news[i] = {
         title: $(elem).find('strong').text(),
         image: imageArray.join(''),
         summary: $(elem).find('.list-summary a').text().trim(),
@@ -40,7 +46,8 @@ export class NewsService {
         url,
       };
     });
-    return ulList;
+    await this.cacheService.set('news', news);
+    return news;
   }
   async getHtml() {
     try {
