@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Repository, Between, Connection, In, FindManyOptions } from 'typeorm';
+import { Repository, Between, In, FindManyOptions } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
@@ -69,13 +69,15 @@ export class PostsService {
     post.views += 1;
     return await this.postRepo.save(post);
   }
-  async readAllPosts(dto: GetPostsDto): Promise<Post[]> {
+  async getPosts(dto: GetPostsDto): Promise<Post[]> {
     // TODO find better way of setting default when dto used
     const take = dto.take ? dto.take : 20;
+    const skip = dto.page ? (dto.page - 1) * take : 0;
     const where = dto.category ? { category: dto.category } : {};
-    if (dto.hashtagId) {
+    if (dto.hashtagId || dto.hashtagTitle) {
       const postIds: number[] = await this.hashTagsService.getPostIdsByHashtag(
-        dto.hashtagId,
+        dto.hashtagId ? dto.hashtagId : dto.hashtagTitle,
+        dto.hashtagId ? 'hashtagId' : 'postId',
       );
       where['id'] = In(postIds);
     }
@@ -87,7 +89,7 @@ export class PostsService {
         createdAt: 'DESC',
       },
       take,
-      skip: (dto.page - 1) * take,
+      skip,
     });
 
     return posts;
@@ -98,7 +100,7 @@ export class PostsService {
       take: 5,
       order: { createdAt: 'DESC' },
     };
-    return await this.getPosts('recommendedPosts', findOptions);
+    return await this.getCachedPosts('recommendedPosts', findOptions);
   }
   async getPopularPosts(): Promise<Post[]> {
     const findOptions: FindManyOptions<Post> = {
@@ -109,7 +111,7 @@ export class PostsService {
       order: { views: 'DESC' },
       take: 5,
     };
-    return await this.getPosts('popularPosts', findOptions);
+    return await this.getCachedPosts('popularPosts', findOptions);
   }
   async getRecommendedPosts(): Promise<Post[]> {
     const findOptions: FindManyOptions<Post> = {
@@ -120,9 +122,9 @@ export class PostsService {
       relations: ['files'],
       take: 6,
     };
-    return await this.getPosts('recommendedPosts', findOptions);
+    return await this.getCachedPosts('recommendedPosts', findOptions);
   }
-  async getPosts(
+  async getCachedPosts(
     key: string,
     findOptions: FindManyOptions<Post>,
   ): Promise<Post[]> {

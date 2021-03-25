@@ -11,6 +11,7 @@ import { UpdateFileDto } from '../../files/dto/update-file.dto';
 export class CreatePostDto {
   // @IsInt()
   @IsString()
+  @IsNotEmpty()
   poster: string;
 
   @IsNotEmpty()

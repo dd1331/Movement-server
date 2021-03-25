@@ -6,7 +6,7 @@ import { Repository, In, getRepository } from 'typeorm';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { Post } from '../posts/entities/post.entity';
-import * as dayjs from 'dayjs';
+type HashtagIdOrTitle = string | number;
 
 @Injectable()
 export class HashtagsService {
@@ -20,9 +20,9 @@ export class HashtagsService {
     const strHashtags: string[] = dto.hashtags;
     try {
       await Promise.all(
-        strHashtags.map(async (hashtag) => {
-          const hashTag = await this.hashtagRepo.create({ title: hashtag });
-          await this.hashtagRepo.save(hashTag);
+        strHashtags.map(async (strHashtag) => {
+          const hashtag = await this.hashtagRepo.create({ title: strHashtag });
+          if (hashtag) await this.hashtagRepo.save(hashtag);
         }),
       );
     } catch (error) {}
@@ -72,10 +72,12 @@ export class HashtagsService {
       .limit(10)
       .getRawMany();
   }
-
-  async getPostIdsByHashtag(hashtagId: number): Promise<number[]> {
+  async getPostIdsByHashtag(
+    hashtagIdOrTitle: HashtagIdOrTitle,
+    column: string,
+  ): Promise<number[]> {
     const postHastags: PostHashtag[] = await this.postHashtagRepo.find({
-      where: { hashtagId },
+      where: { [column]: hashtagIdOrTitle },
     });
     const postIds = postHastags.map((postHastag) => postHastag.postId);
     return postIds;

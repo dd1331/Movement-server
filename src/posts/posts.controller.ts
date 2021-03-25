@@ -25,12 +25,11 @@ export class PostsController {
 
   @Post('create')
   create(@Body() dto: CreatePostDto) {
-    console.log('doto', dto);
     return this.postsService.createPost(dto);
   }
-  @Get('readAll')
-  readAllPosts(@Query() dto: GetPostsDto) {
-    return this.postsService.readAllPosts(dto);
+  @Get()
+  getPosts(@Query() dto: GetPostsDto) {
+    return this.postsService.getPosts(dto);
   }
 
   @Get('recent')

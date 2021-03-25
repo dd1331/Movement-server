@@ -49,7 +49,7 @@ export class WingmanService {
       posts.map(async (post) => {
         const dto: CreatePostDto = {
           ...post,
-          poster: wingman.id,
+          poster: wingman.id.toString(),
           category: 'free',
         };
         return await this.postsService.createPostByWingman(dto);
