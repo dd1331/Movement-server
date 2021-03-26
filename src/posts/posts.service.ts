@@ -100,7 +100,7 @@ export class PostsService {
       take: 5,
       order: { createdAt: 'DESC' },
     };
-    return await this.getCachedPosts('recommendedPosts', findOptions);
+    return await this.getCachedOrNormalPosts('recentPosts', findOptions);
   }
   async getPopularPosts(): Promise<Post[]> {
     const findOptions: FindManyOptions<Post> = {
@@ -111,7 +111,7 @@ export class PostsService {
       order: { views: 'DESC' },
       take: 5,
     };
-    return await this.getCachedPosts('popularPosts', findOptions);
+    return await this.getCachedOrNormalPosts('popularPosts', findOptions);
   }
   async getRecommendedPosts(): Promise<Post[]> {
     const findOptions: FindManyOptions<Post> = {
@@ -122,9 +122,9 @@ export class PostsService {
       relations: ['files'],
       take: 6,
     };
-    return await this.getCachedPosts('recommendedPosts', findOptions);
+    return await this.getCachedOrNormalPosts('recommendedPosts', findOptions);
   }
-  async getCachedPosts(
+  async getCachedOrNormalPosts(
     key: string,
     findOptions: FindManyOptions<Post>,
   ): Promise<Post[]> {

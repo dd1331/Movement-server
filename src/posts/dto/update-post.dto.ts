@@ -1,6 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdatePostDto {
+  @IsString()
+  @IsNotEmpty()
+  poster: string;
+
   @IsNotEmpty()
   title: string;
 

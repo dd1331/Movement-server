@@ -12,6 +12,8 @@ import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { CreateLikeDto } from '../../like/dto/create-like-dto';
 import { GetPostsDto } from '../dto/get-posts.dto';
 import each from 'jest-each';
+import * as dayjs from 'dayjs';
+import { LikesService } from '../../like/likes.service';
 let agent;
 const createUserDto: CreateUserDto = {
   userId: 'testUserId',
@@ -23,13 +25,11 @@ describe('Posts', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let postsService: PostsService;
+  let likesService: LikesService;
   let user: User;
   let post: Post;
   let createPostDto: CreatePostDto;
   let updatePostDto: UpdatePostDto;
-  // const dto: GetPostsDto = {
-  //   category: 'free',
-  // };
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -38,6 +38,8 @@ describe('Posts', () => {
 
     usersService = moduleRef.get<UsersService>(UsersService);
     postsService = moduleRef.get<PostsService>(PostsService);
+    likesService = moduleRef.get<LikesService>(LikesService);
+
     app = moduleRef.createNestApplication();
     await app.init();
     agent = app.getHttpServer();
@@ -50,6 +52,8 @@ describe('Posts', () => {
       category: 'free',
       hashtags: ['해시태그 테스트1', 'test트렌드5'],
     };
+
+    // TODO set createdAt for testing
     const createPostDtoArray = [
       createPostDto,
       {
@@ -108,20 +112,34 @@ describe('Posts', () => {
       { ...createPostDto, category: 'free' },
     ];
     await Promise.all(
-      createPostDtoArray.map(async (item) => {
-        await postsService.createPost(item);
+      createPostDtoArray.map(async (item, index) => {
+        post = await postsService.createPost(item);
+        const createLikeDto: CreateLikeDto = {
+          type: 'post',
+          isLike: true,
+          targetId: post.id,
+          userId: user.id,
+        };
+        if (index < 3) {
+          await likesService.likeOrDislike(createLikeDto);
+        } else {
+          await postsService.readPost(post.id);
+        }
       }),
     );
+    updatePostDto = {
+      title: 'updated title',
+      content: 'updated content',
+      id: post.id,
+      poster: user.id.toString(),
+    };
   });
   afterAll(async () => {
-    // const userRepo: Repository<User> = new Repository<User>();
-    // const postRepo: Repository<Post> = new Repository<Post>();
-    // // await userRepo.delete(user.id);
-    // await postRepo.delete(212);
     await app.close();
   });
   describe('/POST createPost', () => {
     it('created post with no extra ', async () => {
+      delete createPostDto.hashtags;
       const { body } = await request(agent)
         .post('/posts/create')
         .send(createPostDto)
@@ -129,6 +147,7 @@ describe('Posts', () => {
       expect(body).toMatchObject(createPostDto);
     });
     it('create post with file', async () => {
+      delete createPostDto.hashtags;
       const dtoWithHashTag: CreatePostDto = {
         ...createPostDto,
         fileId:
@@ -140,6 +159,13 @@ describe('Posts', () => {
         .send(dtoWithHashTag)
         .expect(HttpStatus.CREATED);
       expect(body).toMatchObject(createPostDto);
+      const createLikeDto: CreateLikeDto = {
+        type: 'post',
+        isLike: true,
+        targetId: post.id,
+        userId: user.id,
+      };
+      await likesService.likeOrDislike(createLikeDto);
     });
     it('create post with hashtags', async () => {
       const dtoWithHashTag: CreatePostDto = {
@@ -227,73 +253,122 @@ describe('Posts', () => {
     );
   });
 
-  // describe('GET getPopularPosts', () => {
-  //   it('should return popular posts', async () => {
-  //     const res = await request(agent).get('/posts/popular');
-  //     console.log(res.body);
-  //   });
-  // });
+  describe('GET getPopularPosts', () => {
+    it('should return popular posts', async () => {
+      await postsService.readPost(post.id);
+      const { body } = await request(agent).get('/posts/popular');
+      const createdArr = body.map((post) => {
+        return post.createdAt;
+      });
+      const viewsArr = body.map((post) => {
+        return post.views;
+      });
+      const isWithinPeriod = createdArr.every((createdAt) => {
+        return dayjs(createdAt).isAfter(dayjs().subtract(7, 'd'));
+      });
+      const sortedViews = viewsArr.map((views) => views).sort((a, b) => b - a);
+      expect(isWithinPeriod).toBe(true);
+      expect(sortedViews).toEqual(viewsArr);
+      expect(viewsArr[0]).toEqual(body[0].views);
+    });
+  });
 
-  // describe('/GET getRecommendedPosts', () => {
-  //   it('should return posts ordered by likes', async () => {
-  //     const res = await request(agent).get('/posts/recommended');
-  //     console.log(res.body);
-  //   });
-  // });
-  // describe('/PATCH updatePost', () => {
-  //   it('should return updated post object', async () => {
-  //     const { body } = await request(agent)
-  //       .patch('/posts')
-  //       .send(updatePostDto)
-  //       .expect(HttpStatus.OK);
-  //     expect(body.title).toBe(updatePostDto.title);
-  //     expect(body.content).toBe(updatePostDto.content);
-  //   });
+  describe('/GET getRecommendedPosts', () => {
+    it('should return posts ordered by likes', async () => {
+      const { body } = await request(agent).get('/posts/recommended');
+      const createdArr = body.map((post) => post.createdAt);
+      const isWithinPeriod = createdArr.every((createdAt) =>
+        dayjs(createdAt).isAfter(dayjs().subtract(7, 'd')),
+      );
+      expect(isWithinPeriod).toBe(true);
+      const likes = body.map((post) => post.likeCount);
+      const sortedLikes = [...likes].sort((a, b) => b - a);
+      expect(likes).toEqual(sortedLikes);
+    });
+  });
+  describe('/PATCH updatePost', () => {
+    // TODO set app context instead of sending poster
+    it('should return updated post object', async () => {
+      const { body } = await request(agent)
+        .patch('/posts')
+        .send(updatePostDto)
+        .expect(HttpStatus.OK);
+      expect({ ...body, poster: body.poster.id.toString() }).toMatchObject(
+        updatePostDto,
+      );
+    });
+    const params = [
+      // [ postId, title, content, expected, httpStatus ]
+      [null, '', '', 2, HttpStatus.BAD_REQUEST],
+      [null, 'valid title', '', 1, HttpStatus.BAD_REQUEST],
+      [null, '', 'valid content', 1, HttpStatus.BAD_REQUEST],
+      [null, 'valid title', 'valid content', 0, HttpStatus.OK],
+      [99999999, 'valid title', 'valid content', 0, HttpStatus.NOT_FOUND],
+    ];
+    // TODO is it better to seperate not found test?
+    each(params).it(
+      'should throw an error if data is not valid',
+      async (postId, title, content, expected, httpStatus) => {
+        const invalidUpdatePostDto: UpdatePostDto = {
+          ...updatePostDto,
+          title,
+          content,
+        };
+        if (postId) invalidUpdatePostDto.id = postId;
+        const { body } = await request(agent)
+          .patch('/posts')
+          .send(invalidUpdatePostDto)
+          .expect(httpStatus);
+        if (httpStatus === HttpStatus.BAD_REQUEST)
+          expect(body.message).toHaveLength(expected);
+      },
+    );
+    it('should throw an error if the post is not existing', async () => {
+      const invalidUpdatePostDto: UpdatePostDto = { ...updatePostDto };
+      invalidUpdatePostDto.id = 99999;
+      const { body } = await request(agent)
+        .patch('/posts')
+        .send(invalidUpdatePostDto)
+        .expect(HttpStatus.NOT_FOUND);
+      expect(body.message).toBe('존재하지 않는 게시글입니다');
+    });
+  });
+  describe('/DELETE deletePost', () => {
+    it('should return deleted post object', async () => {
+      const { body } = await request(agent)
+        .delete(`/posts/${post.id}`)
+        .expect(HttpStatus.OK);
+      expect(body).toBeTruthy();
+    });
+    const params = [
+      // [ postId, httpStatus ]
+      [99999, HttpStatus.NOT_FOUND],
+      // TODO find out a way of returning bad request using pipe when negative value is sent
+      [-33, HttpStatus.NOT_FOUND],
+      ['test', HttpStatus.BAD_REQUEST],
+    ];
+    each(params).it(
+      'should throw an erorr if post does not exist or already deleted',
+      async (postId, httpStatus) => {
+        const { body } = await request(agent)
+          .delete(`/posts/${postId}`)
+          .expect(httpStatus);
+        expect(body.statusCode).toBe(httpStatus);
+        if (httpStatus === HttpStatus.NOT_FOUND)
+          expect(body.message).toBe('존재하지 않는 게시글입니다');
+      },
+    );
+  });
 
-  //   it('should throw an error if data is not valid', async () => {
-  //     const invalidUpdatePostDto: UpdatePostDto = {
-  //       ...updatePostDto,
-  //       title: '',
-  //       content: '',
-  //     };
-  //     const { body } = await request(agent)
-  //       .patch('/posts')
-  //       .send(invalidUpdatePostDto)
-  //       .expect(HttpStatus.BAD_REQUEST);
-  //     expect(body.message).toHaveLength(2); // title, content
-  //   });
-  //   it('should throw an error if the post is not existing', async () => {
-  //     const invalidUpdatePostDto: UpdatePostDto = { ...updatePostDto };
-  //     invalidUpdatePostDto.id = 99999;
-  //     const { body } = await request(agent)
-  //       .patch('/posts')
-  //       .send(invalidUpdatePostDto)
-  //       .expect(HttpStatus.NOT_FOUND);
-  //     expect(body.message).toBe('존재하지 않는 게시글입니다');
-  //   });
-  // });
-  // describe('/DELETE deletePost', () => {
-  //   it('should return deleted post object', async () => {
-  //     const { body } = await request(agent)
-  //       .delete(`/posts/${post.id}`)
-  //       .expect(HttpStatus.OK);
-  //     expect(body).toBeTruthy();
-  //   });
-  //   it('should throw an erorr if post does not exist or already deleted', async () => {
-  //     const { body } = await request(agent)
-  //       .delete(`/posts/${post.id - 1}`)
-  //       .expect(HttpStatus.NOT_FOUND);
-  //     expect(body.statusCode).toBe(HttpStatus.NOT_FOUND);
-  //     expect(body.message).toBe('존재하지 않는 게시글입니다');
-  //   });
-  // });
+  // moved to like test
+
   // describe('/POST likePost', () => {
   //   it('should return created like obejct', async () => {
   //     const createLikeDto: CreateLikeDto = {
   //       type: 'post',
   //       isLike: true,
-  //       targetId: 136,
-  //       userId: 233,
+  //       targetId: post.id,
+  //       userId: user.id,
   //     };
   //     const { body } = await request(agent)
   //       .post('/posts/like')
