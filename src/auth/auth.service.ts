@@ -5,6 +5,7 @@ import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,26 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {} //readonly?
+
+  googleLogin(req: Request) {
+    if (!req.user) {
+      return 'No user from google';
+    }
+
+    return {
+      message: 'User information from google',
+      user: req.user,
+    };
+  }
+  async naverLogin(req: Request) {
+    if (!req.user) {
+      return 'No user from naver';
+    }
+    return {
+      message: 'User information from naver',
+      user: await this.usersService.findOne(233),
+    };
+  }
 
   async validateUser(userName: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByName(userName);

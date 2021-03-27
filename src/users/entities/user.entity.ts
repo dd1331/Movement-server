@@ -16,6 +16,9 @@ export class User extends CommonEntity {
   @Column({ unique: true, name: 'naver_id', nullable: true })
   naverId: string;
 
+  @Column({ unique: true, name: 'google_id', nullable: true })
+  googleId: string;
+
   @Column({ unique: true, name: 'user_name' })
   userName: string;
 
