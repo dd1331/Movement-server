@@ -2,7 +2,7 @@ import { Injectable, Res, Body } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-naver';
 import { AuthService } from '../auth.service';
-import { User } from '../../users/entities/user.entity';
+import { BulkedUser } from '../../users/users.type';
 
 @Injectable()
 export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
@@ -12,22 +12,13 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
       callbackURL: 'http://localhost:3000/auth/naver/redirect',
       clientSecret: 'hE0MnzlWWk',
     });
-    () => {
-      console.log('111');
-    };
   }
   async validate(
     accessToken: string,
     refreshToken: string,
     profile: any,
-    // TODO specify done type
-    done: any,
-  ): Promise<any> {
-    type BulkedUser = Partial<User> & { accessToken };
-    const user: BulkedUser = {
-      naverId: profile.id,
-      accessToken,
-    };
-    done(null, user);
+  ): Promise<BulkedUser> {
+    const user = { naverId: profile.id, accessToken };
+    return user;
   }
 }

@@ -2,8 +2,9 @@ import { Controller, UseGuards, Post, Req, Get } from '@nestjs/common';
 import { LocalAuthGuard } from './local/local-auth.guard';
 import { AuthService } from './auth.service';
 import { NaverAuthGuard } from './naver/naver.auth.guard';
-import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { BulkedUser } from 'src/users/users.type';
 
 @Controller('auth')
 export class AuthController {
@@ -29,12 +30,11 @@ export class AuthController {
   // @UseGuards(AuthGuard('naver'))
   @UseGuards(NaverAuthGuard)
   async loginWithNaver(@Req() req: Request) {}
-  // async loginWithNaver() {}
 
   @Get('naver/redirect')
   // @UseGuards(AuthGuard('naver'))
   @UseGuards(NaverAuthGuard)
   naverAuthRedirect(@Req() req: Request) {
-    return this.authService.naverLogin(req);
+    return this.authService.naverLogin(req.user as BulkedUser);
   }
 }

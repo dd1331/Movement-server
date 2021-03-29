@@ -3,6 +3,7 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { config } from 'dotenv';
 import { Injectable } from '@nestjs/common';
 import { User } from '../../users/entities/user.entity';
+import { BulkedUser } from 'src/users/users.type';
 
 config();
 
@@ -25,7 +26,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ): Promise<any> {
     console.log(profile);
     // TODO set it global
-    type BulkedUser = Partial<User> & { accessToken };
     const user: BulkedUser = {
       googleId: profile.id,
       accessToken,

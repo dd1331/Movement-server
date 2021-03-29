@@ -6,6 +6,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { BulkedUser } from 'src/users/users.type';
 
 @Injectable()
 export class AuthService {
@@ -25,14 +26,17 @@ export class AuthService {
       user: req.user,
     };
   }
-  async naverLogin(req: Request) {
-    if (!req.user) {
-      return 'No user from naver';
+  async naverLogin(naver: BulkedUser): Promise<BulkedUser> {
+    const accessToken = naver.accessToken;
+    const user = await this.getUserBySocial(naver.naverId, 'naver', 'naverId');
+
+    if (!user) {
+      return {
+        ...(await this.signupWithSns(naver.naverId, 'naver', 'naverId')),
+        accessToken,
+      };
     }
-    return {
-      message: 'User information from naver',
-      user: await this.usersService.findOne(233),
-    };
+    return { ...user, accessToken };
   }
 
   async validateUser(userName: string, password: string): Promise<any> {
@@ -47,17 +51,9 @@ export class AuthService {
     const payload = { username: user.username, sub: user.userId };
     return { accessToken: this.jwtService.sign(payload) };
   }
-  async loginWithNaver(id: string): Promise<User> {
-    const user = await this.getUserBySocial(id, 'naver', 'naverId');
 
-    if (!user) {
-      return await this.signupWithSns(id, 'naver', 'naverId');
-    }
-    return user;
-  }
-
-  async getUserBySocial(id: string, provider: string, socialId: string) {
-    const where = { provider, [socialId]: id };
+  async getUserBySocial(id: string, provider: string, column: string) {
+    const where = { provider, [column]: id };
 
     return await this.userRepo.findOne({
       where,
@@ -81,49 +77,4 @@ export class AuthService {
 
     return await this.userRepo.save(user);
   }
-  // async loginWithNaver() {
-  //   const test = new NaverStrategy();
-  //   console.log(test);
-  //   await test.register();
-  //   // passport.use(
-  //   new NaverStrategy(
-  //     {
-  //       clientId: 'ag_B0_vLXpvrgG1J5Upp',
-  //       clientSecret: 'hE0MnzlWWk',
-  //       callbackUrl: 'http://192.168.35.237:8080/auth/naver',
-  //     },
-  //     async (accessToken, refreshToken, profile, done) => {
-  //       // console.log()
-  //       const user = await this.usersService.getUserBySocial(profile.id);
-  //       console.log(user);
-  //       // User.findOne(
-  //       //   {
-  //       //     'naver.id': profile.id,
-  //       //   },
-  //       //   function (err, user) {
-  //       //     if (!user) {
-  //       //       user = new User({
-  //       //         name: profile.displayName,
-  //       //         email: profile.emails[0].value,
-  //       //         username: profile.displayName,
-  //       //         provider: 'naver',
-  //       //         naver: profile._json,
-  //       //       });
-  //       //       user.save(function (err) {
-  //       //         if (err) console.log(err);
-  //       //         return done(err, user);
-  //       //       });
-  //       //     } else {
-  //       //       return done(err, user);
-  //       //     }
-  //       //   },
-  //       // );
-  //     },
-  //   ),
-  // );
-  // }
-
-  // async signupWithSns(id: string) {
-  //   const user = await
-  // }
 }
