@@ -5,12 +5,13 @@ import {
   Req,
   Get,
   Redirect,
-  Res,
+  Body,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './local/local-auth.guard';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { BulkedUser } from '../users/users.type';
 
 @Controller('auth')
 export class AuthController {
@@ -18,27 +19,29 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  googleAuth(@Req() req) {}
+  async googleAuth(@Req() req) {}
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
+  @Redirect('http://localhost:8080')
   googleAuthRedirect(@Req() req) {
     return this.authService.googleLogin(req);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Req() req) {
-    return this.authService.login(req.user);
+  async login(@Req() req) {
+    return await this.authService.login(req.user);
   }
-  @Get('naver')
-  naverLogin(@Res() res) {
-    return this.authService.naverLogin(res);
+  @Post('naver')
+  @Redirect('http://192.168.35.123:3000/auth/naver/redirect')
+  async naverLogin(@Body() user: BulkedUser, @Req() req) {
+    console.log('tes');
+    const res = await this.authService.naverLogin(user);
+    req.user = res;
+    return res;
   }
 
   @Get('naver/redirect')
-  @Redirect('http://192.168.35.123:8080/')
-  naverAuthRedirect(@Req() req: Request) {
-    return this.authService.naverAuthRedirect(req);
-  }
+  naverAuthRedirect(@Req() req: Request) {}
 }
