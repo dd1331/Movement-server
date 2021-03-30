@@ -9,7 +9,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   constructor(private authService: AuthService) {
     super({
       clientID: 'ag_B0_vLXpvrgG1J5Upp',
-      callbackURL: 'http://localhost:3000/auth/naver/redirect',
+      callbackURL: 'http://192.168.35.123:3000/',
       clientSecret: 'hE0MnzlWWk',
     });
   }

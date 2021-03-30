@@ -2,8 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { config } from 'dotenv';
 import { Injectable } from '@nestjs/common';
-import { User } from '../../users/entities/user.entity';
-import { BulkedUser } from 'src/users/users.type';
+import { BulkedUser } from '../../users/users.type';
 
 config();
 

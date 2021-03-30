@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -15,6 +17,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { LikesService } from '../like/likes.service';
 import { GetPostsDto } from './dto/get-posts.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { RolesGuard } from '../roles.guard';
+import { CurrentUser } from '../current.user.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -32,8 +37,10 @@ export class PostsController {
     return this.postsService.getPosts(dto);
   }
 
+  @Roles('admin')
+  @UseGuards(RolesGuard)
   @Get('recent')
-  getRecentPosts() {
+  getRecentPosts(@Req() req, @CurrentUser() user) {
     return this.postsService.getRecentPosts();
   }
 

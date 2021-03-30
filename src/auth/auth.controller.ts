@@ -1,10 +1,16 @@
-import { Controller, UseGuards, Post, Req, Get } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Post,
+  Req,
+  Get,
+  Redirect,
+  Res,
+} from '@nestjs/common';
 import { LocalAuthGuard } from './local/local-auth.guard';
 import { AuthService } from './auth.service';
-import { NaverAuthGuard } from './naver/naver.auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { BulkedUser } from 'src/users/users.type';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +18,7 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {}
+  googleAuth(@Req() req) {}
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
@@ -22,19 +28,17 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req) {
-    return await this.authService.login(req.user);
+  login(@Req() req) {
+    return this.authService.login(req.user);
   }
   @Get('naver')
-  // TOOD check what differences between using AuthGuard('name') and 'customguard?' are
-  // @UseGuards(AuthGuard('naver'))
-  @UseGuards(NaverAuthGuard)
-  async loginWithNaver(@Req() req: Request) {}
+  naverLogin(@Res() res) {
+    return this.authService.naverLogin(res);
+  }
 
   @Get('naver/redirect')
-  // @UseGuards(AuthGuard('naver'))
-  @UseGuards(NaverAuthGuard)
+  @Redirect('http://192.168.35.123:8080/')
   naverAuthRedirect(@Req() req: Request) {
-    return this.authService.naverLogin(req.user as BulkedUser);
+    return this.authService.naverAuthRedirect(req);
   }
 }
