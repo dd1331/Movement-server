@@ -4,26 +4,30 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
+import * as randomWords from 'random-words';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    await this.checkIfExist(createUserDto);
-    const newUser = await this.userRepo.create(createUserDto);
+  async create(dto: CreateUserDto): Promise<User> {
+    await this.checkIfExist(dto);
+    dto.userId = randomWords() + 'ID';
+    dto.userName = randomWords() + 'NAME';
+
+    const newUser = await this.userRepo.create(dto);
     await this.userRepo.save(newUser);
     return newUser;
   }
   //temp any
-  async checkIfExist(createUserDto: CreateUserDto): Promise<boolean> {
-    const { phone, userId, userName } = createUserDto;
-    const where = [{ phone }, { userId }, { userName }];
+  async checkIfExist(dto: CreateUserDto): Promise<boolean> {
+    const { phone } = dto;
+    const where = [{ phone }];
 
     const isExisting = await this.userRepo.findOne({ where });
     if (isExisting) {
-      throw new HttpException('이미 존재하는 **입니다', HttpStatus.CONFLICT);
+      throw new HttpException('이미 존재하는 번호입니다', HttpStatus.CONFLICT);
     }
     return true;
   }
