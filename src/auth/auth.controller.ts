@@ -28,10 +28,11 @@ export class AuthController {
     return this.authService.googleLogin(req);
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  async login(@Req() req) {
-    return await this.authService.login(req.user);
+  @UseGuards(AuthGuard('local'))
+  @Post('jwt')
+  async jwtLogin(@Req() req) {
+    const user: BulkedUser = await this.authService.login(req.user);
+    return user;
   }
   @Post('naver')
   @Redirect('http://192.168.35.123:3000/auth/naver/redirect')

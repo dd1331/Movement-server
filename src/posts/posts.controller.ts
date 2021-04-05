@@ -17,9 +17,6 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { LikesService } from '../like/likes.service';
 import { GetPostsDto } from './dto/get-posts.dto';
-import { Roles } from '../decorators/roles.decorator';
-import { RolesGuard } from '../roles.guard';
-import { CurrentUser } from '../current.user.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -37,10 +34,8 @@ export class PostsController {
     return this.postsService.getPosts(dto);
   }
 
-  @Roles('admin')
-  @UseGuards(RolesGuard)
   @Get('recent')
-  getRecentPosts(@Req() req, @CurrentUser() user) {
+  getRecentPosts(@Req() req) {
     return this.postsService.getRecentPosts();
   }
 

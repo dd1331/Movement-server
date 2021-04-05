@@ -41,17 +41,17 @@ export class AuthService {
     return { ...user, accessToken };
   }
 
-  async validateUser(userName: string, password: string): Promise<any> {
-    const user = await this.usersService.findOneByName(userName);
+  async validateUser(phone: string, password: string): Promise<any> {
+    const user = await this.usersService.getUserByPhone(phone);
     if (user && user.password === password) {
       const { password, ...result } = user;
       return result;
     }
     return null;
   }
-  async login(user: any) {
+  async login(user: any): Promise<BulkedUser> {
     const payload = { username: user.username, sub: user.userId };
-    return { accessToken: this.jwtService.sign(payload) };
+    return { ...user, accessToken: this.jwtService.sign(payload) };
   }
 
   async getUserBySocial(id: string, provider: string, column: string) {

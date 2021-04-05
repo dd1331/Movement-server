@@ -73,6 +73,9 @@ export class UsersService {
     return this.users.find((user) => user.username === name);
   }
 
+  async getUserByPhone(phone: string) {
+    return await this.userRepo.findOne({ where: { phone } });
+  }
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     if (!user) return;
