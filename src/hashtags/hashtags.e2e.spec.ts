@@ -25,8 +25,8 @@ describe('Posts', () => {
       console.log(res.body);
     });
     it('test2', async () => {
-      const res = await hashtagsService.getPostIdsByHashtag(1);
-      console.log(res);
+      // const res = await hashtagsService.getPostIdsByHashtag(1);
+      // console.log(res);
     });
   });
 });
