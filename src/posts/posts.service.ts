@@ -7,7 +7,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { UsersService } from '../users/users.service';
-import { HashtagsService } from '../hashtags/hashTags.service';
+import { HashtagsService } from '../hashtags/hashtags.service';
 import { CacheService } from '../cache/cache.service';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
@@ -20,7 +20,7 @@ export class PostsService {
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
     @InjectRepository(File) private readonly fileRepo: Repository<File>,
     private usersService: UsersService,
-    private hashTagsService: HashtagsService,
+    private hashtagsService: HashtagsService,
     private cacheService: CacheService,
   ) {}
   async createPost(dto: CreatePostDto): Promise<Post> {
@@ -32,7 +32,7 @@ export class PostsService {
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
     }
     // TODO add to other methods
-    if (dto.hashtags) await this.hashTagsService.create(newPost, dto);
+    if (dto.hashtags) await this.hashtagsService.create(newPost, dto);
 
     if (dto.fileId) {
       const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
@@ -75,7 +75,7 @@ export class PostsService {
     const skip = dto.page ? (dto.page - 1) * take : 0;
     const where = dto.category ? { category: dto.category } : {};
     if (dto.hashtagId || dto.hashtagTitle) {
-      const postIds: number[] = await this.hashTagsService.getPostIdsByHashtag(
+      const postIds: number[] = await this.hashtagsService.getPostIdsByHashtag(
         dto.hashtagId ? dto.hashtagId : dto.hashtagTitle,
         dto.hashtagId ? 'hashtagId' : 'postId',
       );

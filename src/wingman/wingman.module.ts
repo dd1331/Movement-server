@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from '../posts/entities/post.entity';
 import { Like } from '../like/entities/like.entity';
 import { File } from '../files/entities/file.entity';
-import { HashtagsService } from '../hashtags/hashTags.service';
+import { HashtagsService } from '../hashtags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 import { PostsModule } from '../posts/posts.module';

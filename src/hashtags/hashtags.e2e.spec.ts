@@ -2,7 +2,7 @@ import { INestApplication, HttpStatus } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
-import { HashtagsService } from './hashTags.service';
+import { HashtagsService } from './hashtags.service';
 describe('Posts', () => {
   let app: INestApplication;
   let hashtagsService: HashtagsService;

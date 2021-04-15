@@ -12,7 +12,7 @@ import { LikesService } from '../like/likes.service';
 import { Comment } from '../comments/entities/comment.entity';
 import { ChildComment } from '../comments/entities/child_comment.entity';
 import { CommentsService } from '../comments/comments.service';
-import { HashtagsService } from '../hashTags/hashtags.service';
+import { HashtagsService } from '../hashtags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from './entities/post_hashtag.entity';
 import { RedisCacheModule } from '../cache/cache.module';
