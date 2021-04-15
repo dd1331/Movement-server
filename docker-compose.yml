@@ -17,11 +17,18 @@ services:
          MYSQL_USER: "charlie"
          MYSQL_PASSWORD: "1331"
          MYSQL_DATABASE: "movement"
+
+   redis:
+      image: "redis"
+      container_name: redis-server
+      ports:
+         - "6379:6379"
+
    backend:
       build: 
          dockerfile: Dockerfile.dev
          context: ./
-      container_name: movement_server
+      container_name: movement-server
       volumes: 
          - /app/node_modules
          - ./:/app
