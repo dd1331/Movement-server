@@ -15,8 +15,16 @@ export class CommonService {
     return 'This action adds a new common';
   }
 
-  async getCategories(type): Promise<Category[]> {
-    return await this.categoryRepo.find({ where: { type } });
+  async getCategories(type): Promise<Partial<Category>[]> {
+    const temp = [
+      { title: 'free' },
+      { title: 'exercise' },
+      { title: 'environment' },
+      { title: 'news' },
+      { title: 'meetup' },
+    ];
+    return temp;
+    // return await this.categoryRepo.find({ where: { type } });
   }
 
   findOne(id: number) {
