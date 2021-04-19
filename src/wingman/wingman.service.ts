@@ -21,7 +21,7 @@ export class WingmanService {
     return 'This action adds a new wingman';
   }
 
-  // @Cron(CronExpression.EVERY_30_SECONDS)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   @Cron(CronExpression.EVERY_DAY_AT_7PM)
   async crawlInstizFreeBoard() {
     this.logger.debug(

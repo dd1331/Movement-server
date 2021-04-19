@@ -65,7 +65,9 @@ export class PostsService {
     return post;
   }
   async readPost(id: number): Promise<Post> {
-    const post = await this.postRepo.findOne(id);
+    const post = await this.postRepo.findOne(id, {
+      relations: ['poster', 'comments', 'comments.commenter', 'likes', 'files'],
+    });
     post.views += 1;
     return await this.postRepo.save(post);
   }
