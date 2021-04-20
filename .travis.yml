@@ -13,9 +13,9 @@ script:
 
 after_success:
   - echo "test succeed!"
-  - docker build -t dd1331/movement-server Dockerfile ./
+  - docker build -t dd1331/movement-server ./
 
-  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "DOCKER_HUB_ID" --password-stdin
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 
   - docker push dd1331/movement-server
 
