@@ -6,7 +6,7 @@ services:
   - docker
 
 before_install:
-  - docker build -t dd1331/movement-server-test -f DockerFile ./
+  - docker build -t dd1331/movement-server-test -f DockerFile .
 
 script:
   # - docker run -e CI=true dd1331/movement-server-test npm run test -- --coverage
