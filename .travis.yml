@@ -19,3 +19,15 @@ after_success:
 
   - docker push dd1331/movement-server
 
+deploy:
+  provider: elasticbeanstalk
+  region: "ap-northeast-2"
+  app: "movement-server"
+  env: "MovementServer-env"
+  bucket_name: elasticbeanstalk-ap-northeast-2-145358528946
+  bucket_path: "elasticbeanstalk-ap-northeast-2-145358528946"
+  on:
+    branch: main
+  
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
