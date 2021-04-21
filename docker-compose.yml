@@ -42,7 +42,7 @@ services:
 
    backend:
       build: 
-         dockerfile: Dockerfile
+         dockerfile: Dockerfile.dev
          context: ./
       ports:
          - "3000:3000"
@@ -52,9 +52,14 @@ services:
          - ./:/app
       # for aws
       environment: 
-         MYSQL_HOST: mysql
-         MYSQL_USER: root
-         MYSQL_ROOT_PASSWORD: a9884592
-         MYSQL_DATABASE: movement
-         MYSQL_PORT: 3306
+         DATABASE_HOST: mysql
+         DATABASE_USERNAME: root
+         DATABASE_PASSWORD: a9884592
+         DATABASE_NAME: movement
+         DATABASE_PORT: 3306
+         # MYSQL_HOST: mysql
+         # MYSQL_USER: root
+         # MYSQL_ROOT_PASSWORD: a9884592
+         # MYSQL_DATABASE: movement
+         # MYSQL_PORT: 3306
    
