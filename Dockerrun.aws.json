@@ -20,6 +20,20 @@
 				}
 			],
 			"memory": 128
+		},
+		{
+			"name": "redis",
+			"image": "redis",
+			"hostname": "redis",
+			"essential": false,
+			"portMappings": [
+				{
+					"hostPort": 6379,
+					"containerPort": 6379
+				}
+			],
+			"memory": 128
 		}
+		
 	]
 }
