@@ -24,6 +24,7 @@ services:
    #       MYSQL_USER: "charlie"
    #       MYSQL_PASSWORD: "1331"
    #       MYSQL_DATABASE: "movement"
+   
    # test
    nginx:
       restart: always

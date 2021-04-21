@@ -14,10 +14,12 @@ script:
 after_success:
   - echo "test succeed!"
   - docker build -t dd1331/movement-server ./
+  - docker build -t dd1331/movement-nginx ./nginx
 
   - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 
   - docker push dd1331/movement-server
+  - docker push dd1331/movement-nginx
 
 deploy:
   provider: elasticbeanstalk
