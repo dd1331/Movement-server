@@ -27,7 +27,7 @@ deploy:
   app: "movement-server"
   env: "Movementserver-env-1"
   bucket_name: elasticbeanstalk-ap-northeast-2-145358528946
-  bucket_path: "elasticbeanstalk-ap-northeast-2-145358528946"
+  bucket_path: "movement-server"
   on:
     branch: main
   
