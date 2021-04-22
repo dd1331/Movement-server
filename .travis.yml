@@ -1,6 +1,7 @@
+language: generic
+
 sudo: required
 
-language: generic
 
 services:
   - docker
@@ -9,7 +10,7 @@ before_install:
   - docker build -t dd1331/movement-server-test -f Dockerfile.dev .
 
 script:
-  # - docker run -e CI=true dd1331/movement-server-test npm run test -- --coverage ㅇㅇ
+  # - docker run -e CI=true dd1331/movement-server-test npm run test -- --coverage
 
 after_success:
   - echo "test succeed!"
@@ -21,15 +22,15 @@ after_success:
   - docker push dd1331/movement-server
   - docker push dd1331/movement-nginx
 
-deploy:
-  provider: elasticbeanstalk
-  region: "ap-northeast-2"
-  app: "movement-server"
-  env: "Movementserver-env-1"
-  bucket_name: elasticbeanstalk-ap-northeast-2-145358528946
-  bucket_path: "movement-server"
-  on:
-    branch: main
+# deploy:
+#   provider: elasticbeanstalk
+#   region: "ap-northeast-2"
+#   app: "movement-server"
+#   env: "Movementserver-env-1"
+#   bucket_name: elasticbeanstalk-ap-northeast-2-145358528946
+#   bucket_path: "movement-server"
+#   on:
+#     branch: main
   
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_ACCESS_KEY
+#   access_key_id: $AWS_ACCESS_KEY
+#   secret_access_key: $AWS_SECRET_ACCESS_KEY

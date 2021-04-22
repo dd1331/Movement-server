@@ -33,32 +33,21 @@ services:
       - /app/node_modules
       # for main app. it was ./backend
       - ./:/app
-    # ports:
-    #   - "3000:3000"
+  
+  
 
-  mysql:
-    image: "mysql:5.7.24"
-    container_name: "typeorm-mysql"
-    ports:
-      - "3306:3306"
-    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-    volumes: 
-      - ./mysql/mysql_data:/var/lib/mysql
-      - ./mysql/sqls/:/docker-entrypoint-initdb.d/
-    environment:
-      MYSQL_ROOT_PASSWORD: "a9884592"
-      MYSQL_USER: "charlie"
-      MYSQL_PASSWORD: "1331"
-      MYSQL_DATABASE: "movement"
   # mysql:
-  #   build: ./mysql
-  #   restart: unless-stopped
-  #   container_name: app_mysql
-  #   ports: 
+  #   image: "mysql:5.7.24"
+  #   container_name: "typeorm-mysql"
+  #   ports:
   #     - "3306:3306"
+  #   command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
   #   volumes: 
   #     - ./mysql/mysql_data:/var/lib/mysql
-  #     - ./mysql/sqls:/docker-entrypoint-initdb.d/
-  #   environment: 
-  #     MYSQL_ROOT_PASSWORD: 1331
-  #     MYSQL_DATABASE: movement
+  #     - ./mysql/sqls/:/docker-entrypoint-initdb.d/
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: "a9884592"
+  #     MYSQL_USER: "charlie"
+  #     MYSQL_PASSWORD: "1331"
+  #     MYSQL_DATABASE: "movement"
+
