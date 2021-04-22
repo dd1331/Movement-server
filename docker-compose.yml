@@ -33,7 +33,13 @@ services:
       - /app/node_modules
       # for main app. it was ./backend
       - ./:/app
-  
+    environment: 
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: a9884592
+      MYSQL_DATABASE: movement
+      MYSQL_PORT: 3306
+      
   
 
   # mysql:

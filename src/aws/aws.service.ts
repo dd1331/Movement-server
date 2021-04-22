@@ -25,8 +25,9 @@ export class AwsService {
 
   getS3() {
     return new S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      // TODO set real ones
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID_TEMP,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_TEMP,
       region: 'ap-northeast-2',
     });
   }

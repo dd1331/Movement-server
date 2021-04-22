@@ -33,14 +33,19 @@ import { RedisCacheModule } from './cache/cache.module';
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT),
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database:
-        process.env.NODE_ENV === 'test'
-          ? process.env.TEST_DATABASE_NAME
-          : process.env.DATABASE_NAME,
+      // host: process.env.DATABASE_HOST,
+      // port: parseInt(process.env.DATABASE_PORT),
+      // username: process.env.DATABASE_USERNAME,
+      // password: process.env.DATABASE_PASSWORD,
+      // database:
+      //   process.env.NODE_ENV === 'test'
+      //     ? process.env.TEST_DATABASE_NAME
+      //     : process.env.DATABASE_NAME,
+      host: process.env.MYSQL_HOST,
+      port: parseInt(process.env.MYSQL_PORT),
+      username: process.env.MYSQL_USER,
+      password: process.env.MYSQL_ROOT_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
       charset: 'utf8mb4',
       entities: [
         User,
