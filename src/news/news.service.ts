@@ -15,6 +15,7 @@ export class NewsService {
   }
 
   async findAll(): Promise<NewsDto[]> {
+    return;
     const cachedNews: NewsDto[] = await this.cacheService.get('news');
     if (cachedNews) return cachedNews;
 

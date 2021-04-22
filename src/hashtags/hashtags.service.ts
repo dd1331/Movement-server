@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateHashtagDto } from './dto/update-hashtag.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Hashtag } from './entities/hashtag.entity';
 import { Repository, In, getRepository } from 'typeorm';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { Post } from '../posts/entities/post.entity';
+import { Hashtag } from './entities/hashtag.entity';
 type HashtagIdOrTitle = string | number;
 
 @Injectable()

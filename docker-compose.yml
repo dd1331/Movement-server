@@ -1,65 +1,64 @@
 version: "3"
 services: 
-#  nginx:
-#   restart: always
-#   build: 
-#    dockerfile: Dockerfile
-#    context: ./nginx
-#   ports: 
-#    - "3000:80"
+  # frontend:
+     # build:
+       # dockerfile: blahblah
+       # context: blahblah
+     # volumes: 
+       # - blahblah
+       # - blahblah
+     # stdin_open: true
 
-   # for local enviroment
-   # mysql:
-   #    image: "mysql:5.7.24"
-   #    # build: ./mysql
-   #    container_name: "typeorm-mysql"
-   #    ports:
-   #       - "3306:3306"
-   #       # volumes: 
-   #          # - ./mysql/mysql_data:/var/lib/mysql
-   #          # - ./mysql/sqls/:/docker-entrypoint-initdb.d/
-   #    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-   #    environment:
-   #       MYSQL_ROOT_PASSWORD: "a9884592"
-   #       MYSQL_USER: "charlie"
-   #       MYSQL_PASSWORD: "1331"
-   #       MYSQL_DATABASE: "movement"
-   
-   # test
-   nginx:
-      restart: always
-      build: 
-         dockerfile: Dockerfile
-         context: ./nginx
-      ports: 
-         - "3000:80"
-         
-   redis:
-      image: "redis"
-      container_name: redis-server
-      ports:
-         - "6379:6379"
+  redis:
+    image: "redis"
+    container_name: redis-server
+    ports: 
+      - "6379:6379"
+  # comment out for now in local
+  nginx:
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports: 
+      - "3000:80"
 
-   backend:
-      build: 
-         dockerfile: Dockerfile.dev
-         context: ./
-      ports:
-         - "3000:3000"
-      container_name: movement-server
-      volumes: 
-         - /app/node_modules
-         - ./:/app
-      # for aws
-      environment: 
-         DATABASE_HOST: mysql
-         DATABASE_USERNAME: root
-         DATABASE_PASSWORD: a9884592
-         DATABASE_NAME: movement
-         DATABASE_PORT: 3306
-         # MYSQL_HOST: mysql
-         # MYSQL_USER: root
-         # MYSQL_ROOT_PASSWORD: a9884592
-         # MYSQL_DATABASE: movement
-         # MYSQL_PORT: 3306
-   
+  backend:
+    build: 
+      dockerfile: Dockerfile.dev
+      # for main app. it was ./backend
+      context: ./
+    container_name: backend
+    volumes: 
+      - /app/node_modules
+      # for main app. it was ./backend
+      - ./:/app
+    # ports:
+    #   - "3000:3000"
+
+  mysql:
+    image: "mysql:5.7.24"
+    container_name: "typeorm-mysql"
+    ports:
+      - "3306:3306"
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes: 
+      - ./mysql/mysql_data:/var/lib/mysql
+      - ./mysql/sqls/:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_ROOT_PASSWORD: "a9884592"
+      MYSQL_USER: "charlie"
+      MYSQL_PASSWORD: "1331"
+      MYSQL_DATABASE: "movement"
+  # mysql:
+  #   build: ./mysql
+  #   restart: unless-stopped
+  #   container_name: app_mysql
+  #   ports: 
+  #     - "3306:3306"
+  #   volumes: 
+  #     - ./mysql/mysql_data:/var/lib/mysql
+  #     - ./mysql/sqls:/docker-entrypoint-initdb.d/
+  #   environment: 
+  #     MYSQL_ROOT_PASSWORD: 1331
+  #     MYSQL_DATABASE: movement

@@ -22,6 +22,7 @@ export class CommonController {
 
   @Get('categories/:type')
   getCategories(@Param('type') type: string) {
+    console.log('sers');
     return this.commonService.getCategories(type);
   }
 
