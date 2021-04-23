@@ -7,7 +7,8 @@ import { CacheController } from './cache.controller';
   imports: [
     CacheModule.register({
       store: redisStore,
-      host: 'redis-server',
+      // host: 'redis-server',
+      host: 'localhost',
       port: 6379,
     }),
   ],
@@ -17,7 +18,8 @@ import { CacheController } from './cache.controller';
     CacheService,
     CacheModule.register({
       store: redisStore,
-      host: 'redis-server',
+      // host: 'redis-server',
+      host: 'localhost',
       port: 6379,
     }),
   ],
