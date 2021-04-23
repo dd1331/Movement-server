@@ -8,7 +8,8 @@ import { CacheController } from './cache.controller';
     CacheModule.register({
       store: redisStore,
       // host: 'redis-server',
-      host: 'localhost',
+      // host: 'localhost',
+      host: process.env.REDIS_URL || 'localhost',
       port: 6379,
     }),
   ],
@@ -19,7 +20,8 @@ import { CacheController } from './cache.controller';
     CacheModule.register({
       store: redisStore,
       // host: 'redis-server',
-      host: 'localhost',
+      // host: 'localhost',
+      host: process.env.REDIS_URL || 'localhost',
       port: 6379,
     }),
   ],
