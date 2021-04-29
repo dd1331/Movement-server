@@ -47,6 +47,7 @@ export class UsersService {
         phone: '01099999999',
         userName: 'test',
         password: '1331',
+        role: 'wingman',
       };
       users.push(await this.create(dto));
     }

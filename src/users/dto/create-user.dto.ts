@@ -8,4 +8,5 @@ export class CreateUserDto extends PartialType(User) {
   phone: string;
   provider?: string;
   naverId?: string;
+  role?: string;
 }
