@@ -41,6 +41,15 @@ export class UsersService {
     const users: User[] = await this.userRepo.find({
       where: { role: 'wingman' },
     });
+    // TODO SEED database instead of hard coding
+    if (!users) {
+      const dto: CreateUserDto = {
+        phone: '01099999999',
+        userName: 'test',
+        password: '1331',
+      };
+      users.push(await this.create(dto));
+    }
     return users;
   }
 

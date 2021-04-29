@@ -22,7 +22,7 @@ export class WingmanService {
   }
 
   // @Cron(CronExpression.EVERY_10_SECONDS)
-  @Cron(CronExpression.EVERY_DAY_AT_7PM)
+  @Cron(CronExpression.EVERY_2_HOURS)
   async crawlInstizFreeBoard() {
     this.logger.debug(
       `crawlInstizFreeBoard started ${WingmanService.name} ${Date.now()}`,
@@ -44,13 +44,14 @@ export class WingmanService {
         return result;
       }),
     );
-
+    // TODO temp
+    const categories = ['free', 'exercise', 'enviroment', 'meetup'];
     await Promise.all(
       posts.map(async (post) => {
         const dto: CreatePostDto = {
           ...post,
           poster: wingman.id.toString(),
-          category: 'free',
+          category: categories[Math.floor(Math.random() * categories.length)],
         };
         return await this.postsService.createPostByWingman(dto);
       }),
