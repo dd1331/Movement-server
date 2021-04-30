@@ -50,6 +50,7 @@
     "random-words": "^1.1.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
+    "rss-parser": "^3.12.0",
     "rxjs": "^6.6.3",
     "typeorm": "^0.2.3"
   },

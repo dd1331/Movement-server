@@ -10,6 +10,8 @@ import fs from 'fs';
 import { S3 } from 'aws-sdk';
 import { AwsService } from 'src/aws/aws.service';
 import { FilesService } from 'src/files/files.service';
+import * as Parser from 'rss-parser';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class NewsService {
@@ -20,10 +22,31 @@ export class NewsService {
   create(createNewsDto: CreateNewsDto) {
     return 'This action adds a new news';
   }
-
   async findAll(): Promise<NewsDto[]> {
-    // const cachedNews: NewsDto[] = await this.cacheService.get('news');
-    // if (cachedNews) return cachedNews;
+    const cachedNews: NewsDto[] = await this.cacheService.get('news');
+    if (cachedNews) return cachedNews;
+    const parser = new Parser();
+    const feed = await parser.parseURL(
+      'https://news.sbs.co.kr/news/SectionRssFeed.do?sectionId=08&plink=RSSREADER',
+    );
+    const news: NewsDto[] = [];
+    feed.items.forEach((item) => {
+      news.push({
+        title: item.title,
+        image: item.enclosure.url,
+        summary: item.author,
+        writer: item.author,
+        writtenAt: dayjs(item.isoDate).toDate(),
+        url: item.link,
+      });
+    });
+    await this.cacheService.set('news', news);
+    return news;
+  }
+
+  async _findAll(): Promise<NewsDto[]> {
+    const cachedNews: NewsDto[] = await this.cacheService.get('news');
+    if (cachedNews) return cachedNews;
 
     const news: NewsDto[] = [];
     const html = await this.getHtml();
@@ -56,18 +79,8 @@ export class NewsService {
         writtenAt: new Date(newsInfoArray[2]),
         url,
       };
-      console.log('response.data.read()', news);
     });
-    console.log(news);
     await this.cacheService.set('news', news);
-    await Promise.all(
-      imageUrls.map(async (imageUrl) => {
-        await this.filesService.imageToAws({
-          fileUrl: imageUrl,
-          fileName: 'testname',
-        });
-      }),
-    );
     return news;
   }
   async getHtml() {
