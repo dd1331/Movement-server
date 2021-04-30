@@ -1,36 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { UsersService } from '../users/users.service';
+import axios, { AxiosResponse } from 'axios';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class AwsService {
   constructor(private usersService: UsersService) {}
-  async upload(file) {
-    const { originalname } = file;
-    const bucketS3 = 'movement-seoul';
-    const location = await this.uploadS3(file.buffer, bucketS3, originalname);
-    return { location };
-  }
-
-  async uploadS3(file, bucket, name) {
-    const s3 = this.getS3();
-    const params = {
-      Bucket: bucket,
-      Key: String(name),
-      Body: file,
-    };
-    const res = await s3.upload(params).promise();
-    return res.Location;
-  }
-
-  getS3() {
-    return new S3({
-      // TODO set real ones
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID_S3,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_S3,
-      region: 'ap-northeast-2',
-    });
-  }
   create(createAwDto) {
     return 'This action adds a new aw';
   }

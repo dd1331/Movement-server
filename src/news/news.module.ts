@@ -2,10 +2,13 @@ import { Module } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { NewsController } from './news.controller';
 import { RedisCacheModule } from '../cache/cache.module';
+import { FilesService } from 'src/files/files.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { File } from 'src/files/entities/file.entity';
 
 @Module({
-  imports: [RedisCacheModule],
+  imports: [RedisCacheModule, TypeOrmModule.forFeature([File])],
   controllers: [NewsController],
-  providers: [NewsService],
+  providers: [NewsService, FilesService],
 })
 export class NewsModule {}
