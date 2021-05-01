@@ -23,7 +23,7 @@ export class WingmanService {
 
   // @Cron(CronExpression.EVERY_MINUTE)
   // @Cron(CronExpression.EVERY_10_SECONDS)
-  @Cron(CronExpression.EVERY_2_HOURS)
+  @Cron(CronExpression.EVERY_HOUR)
   async crawlInstizFreeBoard() {
     this.logger.debug(
       `crawlInstizFreeBoard started ${WingmanService.name} ${Date.now()}`,

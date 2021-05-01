@@ -15,7 +15,6 @@ export class UsersService {
     await this.checkIfExist(dto);
     dto.userId = randomWords() + 'ID';
     dto.userName = randomWords() + 'NAME';
-
     const newUser = await this.userRepo.create(dto);
     await this.userRepo.save(newUser);
     return newUser;
@@ -42,7 +41,7 @@ export class UsersService {
       where: { role: 'wingman' },
     });
     // TODO SEED database instead of hard coding
-    if (!users) {
+    if (users.length === 0) {
       const dto: CreateUserDto = {
         phone: '01099999999',
         userName: 'test',
