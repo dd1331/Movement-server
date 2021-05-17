@@ -5,8 +5,9 @@ import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { BulkedUser } from '../users/users.type';
+import * as bcript from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -41,11 +42,11 @@ export class AuthService {
     return { ...user, accessToken };
   }
 
-  async validateUser(phone: string, password: string): Promise<any> {
+  async validateUser(phone: string, password: string): Promise<User> {
     const user = await this.usersService.getUserByPhone(phone);
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return result;
+    const isEqual = await bcript.compare(password, user.password);
+    if (user && isEqual) {
+      return user;
     }
     return null;
   }

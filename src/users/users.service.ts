@@ -3,8 +3,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as randomWords from 'random-words';
+import * as bcript from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,7 @@ export class UsersService {
   ) {}
   async create(dto: CreateUserDto): Promise<User> {
     await this.checkIfExist(dto);
+    dto.password = await bcript.hash(dto.password, 12);
     dto.userId = randomWords() + 'ID';
     dto.userName = randomWords() + 'NAME';
     const newUser = await this.userRepo.create(dto);
