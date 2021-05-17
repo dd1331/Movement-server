@@ -126,6 +126,17 @@ export class PostsService {
     };
     return await this.getCachedOrNormalPosts('recommendedPosts', findOptions);
   }
+  async getEmphasizedPosts(dto: GetPostsDto): Promise<Post[]> {
+    const findOptions: FindManyOptions<Post> = {
+      where: {
+        // TODO add created filter
+        category: dto.category,
+      },
+      order: { likeCount: 'DESC' },
+      take: 5,
+    };
+    return await this.postRepo.find(findOptions);
+  }
   async getCachedOrNormalPosts(
     key: string,
     findOptions: FindManyOptions<Post>,

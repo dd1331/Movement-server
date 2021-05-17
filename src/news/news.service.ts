@@ -8,8 +8,8 @@ import { CacheService } from '../cache/cache.service';
 import { News } from './entities/news.entity';
 import fs from 'fs';
 import { S3 } from 'aws-sdk';
-import { AwsService } from 'src/aws/aws.service';
-import { FilesService } from 'src/files/files.service';
+import { AwsService } from '../aws/aws.service';
+import { FilesService } from '../files/files.service';
 import * as Parser from 'rss-parser';
 import * as dayjs from 'dayjs';
 

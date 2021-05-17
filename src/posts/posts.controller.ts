@@ -47,6 +47,10 @@ export class PostsController {
   getRecommendedPosts() {
     return this.postsService.getRecommendedPosts();
   }
+  @Get('emphasized')
+  getEmphasizedPosts(@Query() dto: GetPostsDto) {
+    return this.postsService.getEmphasizedPosts(dto);
+  }
 
   @Get(':id')
   getPost(@Param('id', ParseIntPipe) id: number) {
