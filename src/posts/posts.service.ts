@@ -1,4 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
+import { Like as TLike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -96,6 +102,27 @@ export class PostsService {
 
     return posts;
   }
+  async getPostsWithKeyword(dto: GetPostsDto): Promise<Post[]> {
+    if (!dto.keyword) throw new BadRequestException();
+    // TODO seperate search options
+    // there must be a better way of using like function
+    const take = dto.take ? dto.take : 20;
+    const skip = dto.page ? (dto.page - 1) * take : 0;
+    const posts = await this.postRepo.find({
+      where: [
+        { title: TLike(`%${dto.keyword}%`) },
+        { title: TLike(`${dto.keyword}%`) },
+        { title: TLike(`$${dto.keyword}`) },
+        { content: TLike(`%${dto.keyword}%`) },
+        { content: TLike(`${dto.keyword}%`) },
+        { content: TLike(`$${dto.keyword}`) },
+      ],
+      take,
+      skip,
+    });
+    return posts;
+  }
+
   async getRecentPosts(): Promise<Post[]> {
     const findOptions: FindManyOptions<Post> = {
       relations: ['poster', 'comments', 'files'],

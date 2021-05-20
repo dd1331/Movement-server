@@ -51,6 +51,10 @@ export class PostsController {
   getEmphasizedPosts(@Query() dto: GetPostsDto) {
     return this.postsService.getEmphasizedPosts(dto);
   }
+  @Get('search')
+  getPostsWithKeyword(@Query() dto: GetPostsDto) {
+    return this.postsService.getPostsWithKeyword(dto);
+  }
 
   @Get(':id')
   getPost(@Param('id', ParseIntPipe) id: number) {

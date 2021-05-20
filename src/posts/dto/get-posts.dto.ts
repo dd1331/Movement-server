@@ -21,4 +21,8 @@ export class GetPostsDto {
   @IsOptional()
   @IsString()
   hashtagTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  keyword?: string;
 }
