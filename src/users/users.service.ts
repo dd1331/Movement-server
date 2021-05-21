@@ -89,7 +89,11 @@ export class UsersService {
   }
 
   async getUserByPhone(phone: string) {
-    return await this.userRepo.findOne({ where: { phone } });
+    const user = await this.userRepo.findOne({ where: { phone } });
+
+    if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+
+    return user;
   }
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);

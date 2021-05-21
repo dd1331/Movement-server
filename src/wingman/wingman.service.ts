@@ -1,6 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateWingmanDto } from './dto/create-wingman.dto';
-import { UpdateWingmanDto } from './dto/update-wingman.dto';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { UsersService } from '../users/users.service';
@@ -17,10 +15,6 @@ export class WingmanService {
   ) {}
   private readonly logger = new Logger(WingmanService.name);
 
-  create(createWingmanDto: CreateWingmanDto) {
-    return 'This action adds a new wingman';
-  }
-
   // @Cron(CronExpression.EVERY_MINUTE)
   // @Cron(CronExpression.EVERY_10_SECONDS)
   @Cron(CronExpression.EVERY_HOUR)
@@ -30,25 +24,47 @@ export class WingmanService {
     );
     const listUrl = 'https://www.instiz.net/name?category=1';
     const html = await this.getHtml(listUrl);
+    const posts = await this.getPostsValues(html);
+    // TODO temp
+    await this.createPostsByWingman(posts);
+  }
+
+  private async getPostsValues(html) {
     const $ = cheerio.load(html.data);
     const $bodyList = $('#mainboard').children().children();
     const urlList = this.getUrlList($, $bodyList);
-    const users: User[] = await this.usersService.findWingmanUsers();
-    const wingman: User = users[Math.floor(Math.random() * users.length)];
-    const posts = await Promise.all(
+    return await Promise.all(
       urlList.map(async (url) => {
         const html = await this.getHtml(url);
         const $ = cheerio.load(html.data);
         const title = $('.tb_top').find('#nowsubject a').text().trim();
-        const content = $('.memo_content').text().trim();
-        const result = { title, content };
+        const content = $('.memo_content');
+        const contentStr = content.text().trim();
+        let src = '';
+        $('.memo_content')
+          .find('p')
+          .each((index, e) => {
+            if (index >= 1) return;
+            if ($(e).find('img').attr('src'))
+              src = $(e).find('img').attr('src');
+          });
+        const result = { title, content: contentStr, src };
         return result;
       }),
     );
-    // TODO temp
+  }
+
+  private async createPostsByWingman(
+    posts: { title: string; content: string; src?: string }[],
+  ) {
     const categories = ['free', 'exercise', 'enviroment', 'meetup'];
+    const users: User[] = await this.usersService.findWingmanUsers();
+    const wingman: User = users[Math.floor(Math.random() * users.length)];
+    // const images = [];
     await Promise.all(
       posts.map(async (post) => {
+        // if (post.src) this.uploadImage(post.src);
+        // if (post.src) images.push(post.src);
         const dto: CreatePostDto = {
           ...post,
           poster: wingman.id.toString(),
@@ -57,8 +73,9 @@ export class WingmanService {
         return await this.postsService.createPostByWingman(dto);
       }),
     );
+    // TODO implement uploadImage
+    // await Promise.all(images.map(async (url) => await this.uploadImage(url)));
   }
-
   getUrlList($, $bodyList) {
     const urlPrefix = 'https://www.instiz.net';
     const urlList = [];
@@ -77,17 +94,5 @@ export class WingmanService {
     try {
       return await axios.get(url);
     } catch (error) {}
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} wingman`;
-  }
-
-  update(id: number, updateWingmanDto: UpdateWingmanDto) {
-    return `This action updates a #${id} wingman`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} wingman`;
   }
 }
