@@ -8,7 +8,6 @@ import {
   Delete,
   ParseIntPipe,
   Query,
-  UseGuards,
   Req,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';

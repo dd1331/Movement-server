@@ -18,10 +18,12 @@ export class HashtagsService {
   ) {}
   async create(newPost: Post, dto: CreatePostDto) {
     const strHashtags: string[] = dto.hashtags;
+
     try {
       await Promise.all(
         strHashtags.map(async (strHashtag) => {
           const hashtag = await this.hashtagRepo.create({ title: strHashtag });
+
           if (hashtag) await this.hashtagRepo.save(hashtag);
         }),
       );
@@ -37,9 +39,11 @@ export class HashtagsService {
         postHashtag.post = newPost;
         postHashtag.hashtag = hashtag;
         await this.postHashtagRepo.save(postHashtag);
+
         return postHashtag;
       }),
     );
+
     return postHashtags;
   }
 
@@ -56,6 +60,7 @@ export class HashtagsService {
         popularHashTags.push(hashtag);
       }),
     );
+
     return popularHashTags;
   }
   async getCountsAndHashtagIds() {
@@ -80,14 +85,7 @@ export class HashtagsService {
       where: { [column]: hashtagIdOrTitle },
     });
     const postIds = postHastags.map((postHastag) => postHastag.postId);
+
     return postIds;
-  }
-
-  update(id: number, updateHashtagDto: UpdateHashtagDto) {
-    return `This action updates a #${id} hashtag`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} hashtag`;
   }
 }

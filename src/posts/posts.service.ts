@@ -34,9 +34,9 @@ export class PostsService {
 
     await this.postRepo.save(newPost);
 
-    if (!newPost) {
+    if (!newPost)
       throw new HttpException('글 작성에 실패했습니다', HttpStatus.BAD_REQUEST);
-    }
+
     // TODO add to other methods
     if (dto.hashtags) await this.hashtagsService.create(newPost, dto);
 
@@ -61,13 +61,16 @@ export class PostsService {
     const post = await this.postRepo.findOne(id, {
       relations: ['poster', 'comments', 'comments.commenter', 'likes', 'files'],
     });
+
     if (!post) {
       throw new HttpException(
         '존재하지 않는 게시글입니다',
         HttpStatus.NOT_FOUND,
       );
     }
+
     await this.postRepo.save(post);
+
     return post;
   }
   async readPost(id: number): Promise<Post> {
@@ -75,6 +78,7 @@ export class PostsService {
       relations: ['poster', 'comments', 'comments.commenter', 'likes', 'files'],
     });
     post.views += 1;
+
     return await this.postRepo.save(post);
   }
   async getPosts(dto: GetPostsDto): Promise<Post[]> {
@@ -82,6 +86,7 @@ export class PostsService {
     const take = dto.take ? dto.take : 20;
     const skip = dto.page ? (dto.page - 1) * take : 0;
     const where = dto.category ? { category: dto.category } : {};
+
     if (dto.hashtagId || dto.hashtagTitle) {
       const postIds: number[] = await this.hashtagsService.getPostIdsByHashtag(
         dto.hashtagId ? dto.hashtagId : dto.hashtagTitle,
@@ -120,6 +125,7 @@ export class PostsService {
       take,
       skip,
     });
+
     return posts;
   }
 
@@ -129,6 +135,7 @@ export class PostsService {
       take: 5,
       order: { createdAt: 'DESC' },
     };
+
     return await this.getCachedOrNormalPosts('recentPosts', findOptions);
   }
   async getPopularPosts(): Promise<Post[]> {
@@ -140,6 +147,7 @@ export class PostsService {
       order: { views: 'DESC' },
       take: 5,
     };
+
     return await this.getCachedOrNormalPosts('popularPosts', findOptions);
   }
   async getRecommendedPosts(): Promise<Post[]> {
@@ -151,6 +159,7 @@ export class PostsService {
       relations: ['files'],
       take: 6,
     };
+
     return await this.getCachedOrNormalPosts('recommendedPosts', findOptions);
   }
   async getEmphasizedPosts(dto: GetPostsDto): Promise<Post[]> {
@@ -162,6 +171,7 @@ export class PostsService {
       order: { likeCount: 'DESC' },
       take: 5,
     };
+
     return await this.postRepo.find(findOptions);
   }
   async getCachedOrNormalPosts(
@@ -184,34 +194,43 @@ export class PostsService {
     const existingPost = await this.getPost(dto.id);
 
     if (!existingPost) return;
+
     const newFiles = await this.fileRepo.find({ where: { id: dto.fileId } });
     existingPost.title = title;
     existingPost.content = content;
     existingPost.files = newFiles;
     const updatedPost = await this.postRepo.save(existingPost);
+
     return updatedPost;
   }
   async deletePost(postId: number): Promise<Post> {
     // TODO softdelete related comments
     const post = await this.getPost(postId);
+
     if (!post) return;
+
     post.deletedAt = new Date();
     await this.postRepo.save(post);
+
     return post;
   }
 
   async likeOrDislikePost(dto: CreateLikeDto): Promise<Like[]> {
     const post = await this.getPost(dto.targetId);
+
     if (!post) return;
+
     const like = await this.likeRepo.findOne({
       where: { post: { id: dto.targetId }, user: { id: dto.userId } },
     });
+
     if (!like) {
       await this.createLike(dto, post);
     }
     if (like) {
       await this.updateLikeCount(like, dto, post);
     }
+
     const likes = await this.likeRepo.find({
       where: { post: { id: dto.targetId } },
     });
@@ -247,17 +266,21 @@ export class PostsService {
     }
     await this.likeRepo.save(like);
     await this.postRepo.save(post);
+
     return like;
   }
   async createLike(dto: CreateLikeDto, post) {
     const user = await this.usersService.findOne(dto.userId);
+
     if (dto.isLike) post.likeCount += 1;
     if (!dto.isLike) post.dislikeCount += 1;
+
     await this.postRepo.save(post);
     const like = await this.likeRepo.create(dto);
     like.post = post;
     like.user = user;
     await this.likeRepo.save(like);
+
     return like;
   }
 }

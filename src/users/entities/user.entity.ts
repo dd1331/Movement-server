@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../common.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
@@ -7,9 +7,6 @@ import { ChildComment } from '../../comments/entities/child_comment.entity';
 
 @Entity()
 export class User extends CommonEntity {
-  // @PrimaryGeneratedColumn()
-  // id: number;
-
   @Column({ unique: true, name: 'user_id' })
   userId: string;
 
@@ -37,15 +34,15 @@ export class User extends CommonEntity {
   @Column({ nullable: true })
   avatar: string;
 
-  @OneToMany((type) => Post, (post) => post.poster)
+  @OneToMany(() => Post, (post) => post.poster)
   posts: [Post];
 
-  @OneToMany((type) => Comment, (comment) => comment.commenter)
+  @OneToMany(() => Comment, (comment) => comment.commenter)
   comments: [Comment];
 
-  @OneToMany((type) => ChildComment, (comment) => comment.commenter)
+  @OneToMany(() => ChildComment, (comment) => comment.commenter)
   childComments: [ChildComment];
 
-  @OneToMany((type) => Like, (like) => like.user)
+  @OneToMany(() => Like, (like) => like.user)
   likes: [Like];
 }

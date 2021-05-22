@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { CommonEntity } from '../../common.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { User } from '../../users/entities/user.entity';
@@ -13,9 +7,6 @@ import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity()
 export class Like extends CommonEntity {
-  // @PrimaryGeneratedColumn()
-  // id: number;
-
   @Column()
   type: string;
 

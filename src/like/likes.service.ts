@@ -34,34 +34,27 @@ export class LikesService {
     if (!targetEntity) return;
 
     const [like] = await this.getLikes(dto, true);
-    if (!like) {
-      await this.createLike(dto, targetEntity);
-    }
-    if (like) {
-      await this.updateLikeCount(like, dto, targetEntity);
-    }
+
+    if (!like) await this.createLike(dto, targetEntity);
+
+    if (like) await this.updateLikeCount(like, dto, targetEntity);
+
     const likes = await this.getLikes(dto);
     return likes;
   }
   async getLikes(dto: CreateLikeDto, isMine?): Promise<Like[]> {
-    const where = {
-      type: dto.type,
-    };
-    if (isMine) {
-      where['user'] = { id: dto.userId };
-    }
-    if (dto.type === POST) {
-      where[POST] = { id: dto.targetId };
-    }
-    if (dto.type === COMMENT) {
-      where[COMMENT] = { id: dto.targetId };
-    }
-    if (dto.type === CHILD_COMMENT) {
-      where[CHILD_COMMENT] = { id: dto.targetId };
-    }
-    const likes = await this.likeRepo.find({
-      where,
-    });
+    const where = { type: dto.type };
+
+    if (isMine) where['user'] = { id: dto.userId };
+
+    if (dto.type === POST) where[POST] = { id: dto.targetId };
+
+    if (dto.type === COMMENT) where[COMMENT] = { id: dto.targetId };
+
+    if (dto.type === CHILD_COMMENT) where[CHILD_COMMENT] = { id: dto.targetId };
+
+    const likes = await this.likeRepo.find({ where });
+
     return likes;
   }
   async updateLikeCount(
@@ -70,6 +63,7 @@ export class LikesService {
     target: LikeTarget,
   ): Promise<Like> {
     const status: boolean | null = like.isLike;
+
     if (status === null && dto.isLike) {
       target.likeCount += 1;
       like.isLike = dto.isLike;
@@ -96,49 +90,46 @@ export class LikesService {
       target.dislikeCount -= 1;
       like.isLike = null;
     }
+
     await this.saveTarget(dto, target);
     await this.likeRepo.save(like);
+
     return like;
   }
   async createLike(dto: CreateLikeDto, target: LikeTarget) {
     const user = await this.usersService.findOne(dto.userId);
+
     if (dto.isLike) target.likeCount += 1;
     if (!dto.isLike) target.dislikeCount += 1;
+
     this.saveTarget(dto, target);
     const like: Like = await this.likeRepo.create(dto);
-    if (dto.type === POST) {
-      like.post = target as Post;
-    }
-    if (dto.type === COMMENT) {
-      like.comment = target as Comment;
-    }
-    if (dto.type === CHILD_COMMENT) {
-      like.childComment = target as ChildComment;
-    }
+
+    if (dto.type === POST) like.post = target as Post;
+
+    if (dto.type === COMMENT) like.comment = target as Comment;
+
+    if (dto.type === CHILD_COMMENT) like.childComment = target as ChildComment;
+
     like.user = user;
     await this.likeRepo.save(like);
+
     return like;
   }
   async getTargetEntity(dto: CreateLikeDto) {
-    if (dto.type === POST) {
-      return await this.postsService.getPost(dto.targetId);
-    }
-    if (dto.type === COMMENT) {
+    if (dto.type === POST) return await this.postsService.getPost(dto.targetId);
+
+    if (dto.type === COMMENT)
       return await this.commentsService.readComment(dto.targetId);
-    }
-    if (dto.type === CHILD_COMMENT) {
+
+    if (dto.type === CHILD_COMMENT)
       return await this.commentsService.readChildComment(dto.targetId);
-    }
   }
   async saveTarget(dto: CreateLikeDto, target: LikeTarget) {
-    if (dto.type === POST) {
-      await this.postRepo.save(target);
-    }
-    if (dto.type === COMMENT) {
-      await this.commentRepo.save(target);
-    }
-    if (dto.type === CHILD_COMMENT) {
-      await this.childCommentRepo.save(target);
-    }
+    if (dto.type === POST) await this.postRepo.save(target);
+
+    if (dto.type === COMMENT) await this.commentRepo.save(target);
+
+    if (dto.type === CHILD_COMMENT) await this.childCommentRepo.save(target);
   }
 }

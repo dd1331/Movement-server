@@ -33,6 +33,7 @@ export class WingmanService {
     const $ = cheerio.load(html.data);
     const $bodyList = $('#mainboard').children().children();
     const urlList = this.getUrlList($, $bodyList);
+
     return await Promise.all(
       urlList.map(async (url) => {
         const html = await this.getHtml(url);
@@ -49,6 +50,7 @@ export class WingmanService {
               src = $(e).find('img').attr('src');
           });
         const result = { title, content: contentStr, src };
+
         return result;
       }),
     );
@@ -85,9 +87,11 @@ export class WingmanService {
         const isLocked = $(elem).find('.listsubject .minitext').html();
         const url =
           urlPrefix + $(elem).find('.listsubject a').attr('href').slice(2);
+
         if (!isLocked) urlList.push(url);
       } catch (error) {}
     });
+
     return urlList;
   }
   async getHtml(url) {

@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AwsService } from '../aws/aws.service';
 import { S3 } from 'aws-sdk';
-import { UploadFileDto } from './dto/upload-file.dto';
 import { CreateFileDto } from './dto/create-file.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,6 +16,7 @@ export class FilesService {
   async createFile(dto: CreateFileDto): Promise<File> {
     const createdFile = await this.fileRepo.create(dto);
     await this.fileRepo.save(createdFile);
+
     return createdFile;
   }
   async upload(file): Promise<File> {
@@ -36,6 +35,7 @@ export class FilesService {
       type: file.type,
     };
     const createdFile = await this.createFile(uploadFileDto);
+
     return createdFile;
   }
 
@@ -46,20 +46,8 @@ export class FilesService {
       Key: String(name),
       Body: file,
     };
-    return await s3.upload(params).promise();
-    // console.log('res2', res);
-    // return res.Location;
 
-    // return new Promise((resolve, reject) => {
-    //   s3.upload(params, (err, data) => {
-    //     if (err) {
-    //       console.log(err);
-    //       reject(err.message);
-    //     }
-    //     console.log('data', data);
-    //     resolve(data);
-    //   });
-    // });
+    return await s3.upload(params).promise();
   }
 
   getS3() {
@@ -74,7 +62,10 @@ export class FilesService {
     fileResponse: AxiosResponse,
     fileName: string,
     bucket: string,
-  ): { passThrough: PassThrough; promise: Promise<S3.ManagedUpload.SendData> } {
+  ): {
+    passThrough: PassThrough;
+    promise: Promise<S3.ManagedUpload.SendData>;
+  } {
     const s3 = new S3({
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -90,6 +81,7 @@ export class FilesService {
         Body: passThrough,
       })
       .promise();
+
     return { passThrough, promise };
   }
   async downloadFile(downloadUrl: string): Promise<any> {
@@ -106,7 +98,6 @@ export class FilesService {
       event.fileName,
       'movement-seoul',
     );
-
     responseStream.data.pipe(passThrough);
 
     return promise
@@ -118,24 +109,5 @@ export class FilesService {
         console.log(e);
         throw e;
       });
-  }
-  create(createAwDto) {
-    return 'This action adds a new aw';
-  }
-
-  findAll() {
-    return `This action returns all aws`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} aw`;
-  }
-
-  update(id: number, updateAwDto) {
-    return `This action updates a #${id} aw`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} aw`;
   }
 }

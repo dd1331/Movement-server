@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import { INestApplication, HttpStatus } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../app.module';
 import { AwsService } from './aws.service';

@@ -7,7 +7,6 @@ import {
   Redirect,
   Body,
 } from '@nestjs/common';
-import { LocalAuthGuard } from './local/local-auth.guard';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';

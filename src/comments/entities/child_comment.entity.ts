@@ -1,20 +1,10 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { CommonEntity } from '../../common.entity';
 import { Like } from '../../like/entities/like.entity';
 @Entity()
 export class ChildComment extends CommonEntity {
-  // @PrimaryGeneratedColumn()
-  // id: number;
-
   @Column()
   content: string;
 

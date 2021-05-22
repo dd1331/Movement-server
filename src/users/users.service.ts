@@ -14,27 +14,32 @@ export class UsersService {
   ) {}
   async create(dto: CreateUserDto): Promise<User> {
     await this.checkIfExist(dto);
+
     dto.password = await bcript.hash(dto.password, 12);
     dto.userId = randomWords() + 'ID';
     dto.userName = randomWords() + 'NAME';
+
     const newUser = await this.userRepo.create(dto);
     await this.userRepo.save(newUser);
+
     return newUser;
   }
   //temp any
   async checkIfExist(dto: CreateUserDto): Promise<boolean> {
     const { phone } = dto;
     const where = [{ phone }];
-
     const isExisting = await this.userRepo.findOne({ where });
+
     if (isExisting) {
       throw new HttpException('이미 존재하는 번호입니다', HttpStatus.CONFLICT);
     }
+
     return true;
   }
 
   async findAll(): Promise<User[]> {
     const users: User[] = await this.userRepo.find();
+
     return users;
   }
 
@@ -52,11 +57,13 @@ export class UsersService {
       };
       users.push(await this.create(dto));
     }
+
     return users;
   }
 
   async findAllWithDeleted(): Promise<User[]> {
     const users: User[] = await this.userRepo.find({ withDeleted: true });
+
     return users;
   }
 
@@ -64,9 +71,8 @@ export class UsersService {
     const user: User = await this.userRepo.findOne({
       where: { id },
     });
-    if (!user) {
-      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-    }
+
+    if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
     return user;
   }
@@ -97,6 +103,7 @@ export class UsersService {
   }
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
+
     if (!user) return;
 
     await this.userRepo.update(id, updateUserDto);
@@ -107,9 +114,9 @@ export class UsersService {
   }
   async remove(id: number): Promise<User> {
     const user: User = await this.userRepo.findOne(id);
-    if (!user) {
-      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-    }
+
+    if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+
     await this.userRepo.softDelete(id);
 
     const deletedUser = await this.userRepo.findOne(id, { withDeleted: true });
@@ -118,6 +125,7 @@ export class UsersService {
   }
   async hardRemove(id: number): Promise<boolean> {
     await this.userRepo.delete(id);
+
     return true;
   }
 }
