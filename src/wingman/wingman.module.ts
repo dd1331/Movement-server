@@ -12,6 +12,7 @@ import { HashtagsService } from '../hashtags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 import { PostsModule } from '../posts/posts.module';
+import { FilesService } from '../files/files.service';
 
 @Module({
   imports: [
@@ -19,6 +20,12 @@ import { PostsModule } from '../posts/posts.module';
     PostsModule,
   ],
   controllers: [WingmanController],
-  providers: [WingmanService, UsersService, PostsService, HashtagsService],
+  providers: [
+    WingmanService,
+    UsersService,
+    PostsService,
+    HashtagsService,
+    FilesService,
+  ],
 })
 export class WingmanModule {}

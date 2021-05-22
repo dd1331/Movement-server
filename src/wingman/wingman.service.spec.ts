@@ -7,6 +7,12 @@ import { User } from '../users/entities/user.entity';
 import { Post } from '../posts/entities/post.entity';
 import { Like } from '../like/entities/like.entity';
 import { File } from '../files/entities/file.entity';
+import { Hashtag } from '../hashtags/entities/hashtag.entity';
+import { PostHashtag } from '../posts/entities/post_hashtag.entity';
+import { CacheService } from '../cache/cache.service';
+import { HashtagsService } from '../hashtags/hashtags.service';
+import { CACHE_MANAGER } from '@nestjs/common';
+import { FilesService } from '../files/files.service';
 
 describe('WingmanService', () => {
   let service: WingmanService;
@@ -17,6 +23,14 @@ describe('WingmanService', () => {
         WingmanService,
         UsersService,
         PostsService,
+        HashtagsService,
+        CacheService,
+        FilesService,
+        { provide: getRepositoryToken(Like), useValue: {} },
+        { provide: getRepositoryToken(File), useValue: {} },
+        { provide: getRepositoryToken(Hashtag), useValue: {} },
+        { provide: getRepositoryToken(PostHashtag), useValue: {} },
+        { provide: CACHE_MANAGER, useValue: {} },
         {
           provide: getRepositoryToken(User),
           useValue: {
@@ -74,8 +88,9 @@ describe('WingmanService', () => {
   it('should be defined', () => {
     // expect(service).toBeDefined();
   });
-  it('test', async () => {
-    await service.crawlInstizFreeBoard();
-    // console.log(res);
+  describe('dd', () => {
+    it('test', async () => {
+      expect(service.uploadImage).toBeDefined();
+    });
   });
 });

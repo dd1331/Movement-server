@@ -3,10 +3,17 @@ import { PostsService } from '../posts.service';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Post } from '../entities/post.entity';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, CACHE_MANAGER } from '@nestjs/common';
 import { Like } from '../../like/entities/like.entity';
 import { CreateLikeDto } from '../../like/dto/create-like-dto';
 import { CreatePostDto } from '../dto/create-post.dto';
+import { File } from '../../files/entities/file.entity';
+import { UsersService } from '../../users/users.service';
+import { User } from '../../users/entities/user.entity';
+import { CacheService } from '../../cache/cache.service';
+import { HashtagsService } from '../../hashtags/hashtags.service';
+import { Hashtag } from '../../hashtags/entities/hashtag.entity';
+import { PostHashtag } from '../entities/post_hashtag.entity';
 const newPosts = [
   {
     id: 1,
@@ -63,7 +70,15 @@ describe('PostsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        UsersService,
         PostsService,
+        HashtagsService,
+        CacheService,
+        { provide: getRepositoryToken(File), useValue: {} },
+        { provide: getRepositoryToken(User), useValue: {} },
+        { provide: getRepositoryToken(Hashtag), useValue: {} },
+        { provide: getRepositoryToken(PostHashtag), useValue: {} },
+        { provide: CACHE_MANAGER, useValue: {} },
         {
           provide: getRepositoryToken(Post),
           useValue: {

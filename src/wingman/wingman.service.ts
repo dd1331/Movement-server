@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -6,17 +7,26 @@ import { User } from '../users/entities/user.entity';
 import { PostsService } from '../posts/posts.service';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import * as dayjs from 'dayjs';
+import { FilesService } from '../files/files.service';
+import { S3 } from 'aws-sdk';
+import { Post } from '../posts/entities/post.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class WingmanService {
   constructor(
     private usersService: UsersService,
     private postsService: PostsService,
+    private filesService: FilesService,
+    @InjectRepository(Post) private readonly postRepo: Repository<Post>,
   ) {}
   private readonly logger = new Logger(WingmanService.name);
 
   // @Cron(CronExpression.EVERY_MINUTE)
   // @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron(CronExpression.EVERY_30_SECONDS)
   @Cron(CronExpression.EVERY_HOUR)
   async crawlInstizFreeBoard() {
     this.logger.debug(
@@ -46,6 +56,7 @@ export class WingmanService {
           .find('p')
           .each((index, e) => {
             if (index >= 1) return;
+
             if ($(e).find('img').attr('src'))
               src = $(e).find('img').attr('src');
           });
@@ -59,24 +70,70 @@ export class WingmanService {
   private async createPostsByWingman(
     posts: { title: string; content: string; src?: string }[],
   ) {
-    const categories = ['free', 'exercise', 'enviroment', 'meetup'];
+    const categories = ['free', 'exercise', 'environment', 'meetup'];
     const users: User[] = await this.usersService.findWingmanUsers();
     const wingman: User = users[Math.floor(Math.random() * users.length)];
-    // const images = [];
     await Promise.all(
       posts.map(async (post) => {
-        // if (post.src) this.uploadImage(post.src);
-        // if (post.src) images.push(post.src);
         const dto: CreatePostDto = {
           ...post,
           poster: wingman.id.toString(),
           category: categories[Math.floor(Math.random() * categories.length)],
         };
-        return await this.postsService.createPostByWingman(dto);
+        const createdPost = await this.postsService.createPostByWingman(dto);
+
+        if (post.src) {
+          await this.uploadImage(createdPost, post.src);
+        }
+
+        return createdPost;
       }),
     );
-    // TODO implement uploadImage
-    // await Promise.all(images.map(async (url) => await this.uploadImage(url)));
+  }
+  async uploadImage(createdPost: Post, url) {
+    const path = 'wingmantest' + dayjs().valueOf().toString() + '.jpg';
+    await axios({
+      url,
+      responseType: 'stream',
+    }).then((res) => {
+      return new Promise((resolve, reject) => {
+        res.data
+          .pipe(fs.createWriteStream(path))
+          .on('finish', (r) => resolve(r))
+          .on('error', (e) => reject(e));
+      });
+    });
+    // TODO remove
+    const s3 = new S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: 'ap-northeast-2',
+    });
+    fs.readFile(path, async (err, data) => {
+      if (err) {
+        fs.unlinkSync(path);
+        throw new Error();
+      }
+      const params = {
+        Bucket: 'movement-seoul',
+        Key: path,
+        Body: data,
+        ContentType: 'image/jpeg',
+      };
+      const { Location, ETag, Key } = await s3.upload(params).promise();
+      const uploadFileDto = {
+        url: Location,
+        eTag: ETag,
+        key: Key,
+        size: 0,
+        type: 'jpg',
+      };
+      const file = await this.filesService.createFile(uploadFileDto);
+      if (file) {
+        createdPost.files = [file];
+        await this.postRepo.save(createdPost);
+      }
+    });
   }
   getUrlList($, $bodyList) {
     const urlPrefix = 'https://www.instiz.net';
