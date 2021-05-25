@@ -151,16 +151,31 @@ export class PostsService {
     return await this.getCachedOrNormalPosts('popularPosts', findOptions);
   }
   async getRecommendedPosts(): Promise<Post[]> {
+    const cachedRecommendedPosts: Post[] = await this.getCached(
+      'recommendedPosts',
+    );
+    if (cachedRecommendedPosts) return cachedRecommendedPosts;
+
+    const postIds: number[] = await this.getPostIdsWithImage();
     const findOptions: FindManyOptions<Post> = {
-      where: {
-        createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
-      },
-      order: { likeCount: 'DESC' },
+      where: { id: In(postIds) },
+      order: { likeCount: 'DESC', createdAt: 'DESC' },
       relations: ['files'],
       take: 6,
     };
 
     return await this.getCachedOrNormalPosts('recommendedPosts', findOptions);
+  }
+
+  private async getPostIdsWithImage(): Promise<number[]> {
+    const files: File[] = await this.fileRepo.find({
+      where: {
+        createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
+      },
+      relations: ['post'],
+    });
+    const postIds = files.map((file) => file.post.id);
+    return postIds;
   }
   async getEmphasizedPosts(dto: GetPostsDto): Promise<Post[]> {
     const findOptions: FindManyOptions<Post> = {
@@ -178,7 +193,7 @@ export class PostsService {
     key: string,
     findOptions: FindManyOptions<Post>,
   ): Promise<Post[]> {
-    const cashedPosts: Post[] = await this.cacheService.get(key);
+    const cashedPosts: Post[] = await this.getCached(key);
 
     if (cashedPosts) return cashedPosts;
 
@@ -187,6 +202,11 @@ export class PostsService {
     await this.cacheService.set(key, posts);
 
     return posts;
+  }
+  async getCached<T>(key: string): Promise<T[] | null> {
+    const cashed: T[] = await this.cacheService.get(key);
+
+    return cashed ? cashed : null;
   }
 
   async updatePost(dto: UpdatePostDto): Promise<Post> {

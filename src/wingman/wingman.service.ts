@@ -130,6 +130,7 @@ export class WingmanService {
       };
       const file = await this.filesService.createFile(uploadFileDto);
       if (file) {
+        fs.unlinkSync(path);
         createdPost.files = [file];
         await this.postRepo.save(createdPost);
       }
