@@ -71,8 +71,8 @@ describe('Users', () => {
         .send(newUser)
         .expect(201);
       const { userId, userName, phone, role } = response.body;
-      expect(userId).toBe(newUser.userId);
-      expect(userName).toBe(newUser.userName);
+      expect(userId).toBeTruthy();
+      expect(userName).toBeTruthy();
       expect(phone).toBe(newUser.phone);
       expect(role).toBe('user');
       createdUser = response.body;
@@ -106,7 +106,6 @@ describe('Users', () => {
       const { body } = await request(app.getHttpServer()).get(
         '/users/' + userId,
       );
-      console.log(body);
       expect(body.statusCode).toBe(HttpStatus.NOT_FOUND);
       expect(body.message).toBe('user not found');
     });
@@ -123,7 +122,6 @@ describe('Users', () => {
       const { body } = await request(app.getHttpServer())
         .patch('/users/' + userId)
         .send(updateUserDto);
-      console.log(body);
       expect(body.userName).toBe(updateUserDto.userName);
       expect(body.userId).toBe(updateUserDto.userId);
       expect(body.password).toBe(updateUserDto.password);

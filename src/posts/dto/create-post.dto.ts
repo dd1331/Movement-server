@@ -1,6 +1,8 @@
 import { IsNotEmpty, IsOptional, IsArray, IsString } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { Post } from '../entities/post.entity';
 
-export class CreatePostDto {
+export class CreatePostDto extends PartialType(Post) {
   @IsString()
   @IsNotEmpty()
   poster: string;
@@ -23,4 +25,7 @@ export class CreatePostDto {
   @IsOptional()
   @IsArray()
   hashtags?: string[];
+
+  @IsOptional()
+  createdAt?: Date;
 }

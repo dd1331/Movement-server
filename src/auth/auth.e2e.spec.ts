@@ -19,22 +19,8 @@ describe('Auth', () => {
     await app.close();
   });
   describe('SOCIAL LOGIN/SIGNUP', () => {
-    const naverId = '12428472';
     it('create new User and return it when not existing', async () => {
-      const { body } = await request(agent)
-        .post('/auth/naver')
-        .send({ id: naverId });
-      // .expect(HttpStatus.OK);
-      // expect(body.naverId).toBe(naverId);
-      // console.log('body', body);
-    });
-    it('return User object when exinting', async () => {
-      const { body } = await request(agent)
-        .post('/auth/naver')
-        .send({ id: naverId });
-      // .expect(HttpStatus.OK);
-      // expect(body.naverId).toBe(naverId);
-      // console.log('body', body);
+      return;
     });
   });
 });

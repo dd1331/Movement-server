@@ -23,7 +23,7 @@ describe('wingman', () => {
   });
   describe('test', () => {
     it('test', async () => {
-      await wingmanService.crawlInstizFreeBoard();
+      // await wingmanService.crawlInstizFreeBoard();
     });
   });
 });

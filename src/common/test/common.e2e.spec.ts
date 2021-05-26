@@ -11,7 +11,6 @@ describe('Posts', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-
     commonService = moduleRef.get<CommonService>(CommonService);
     app = moduleRef.createNestApplication();
     await app.init();
@@ -27,7 +26,6 @@ describe('Posts', () => {
       const { body } = await request(app.getHttpServer()).get(
         `/common/categories/board`,
       );
-      console.log(body);
     });
   });
 });
