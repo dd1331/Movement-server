@@ -15,7 +15,7 @@ import { Like } from '../like/entities/like.entity';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { UsersService } from '../users/users.service';
 import { HashtagsService } from '../hashtags/hashtags.service';
-import { CacheService } from '../cache/cache.service';
+// import { CacheService } from '../cache/cache.service';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
 import { GetPostsDto } from './dto/get-posts.dto';
@@ -31,8 +31,7 @@ export class PostsService {
     @InjectRepository(RecommendedPost)
     private readonly recommendedPost: Repository<RecommendedPost>,
     private readonly usersService: UsersService,
-    private readonly hashtagsService: HashtagsService,
-    private readonly cacheService: CacheService,
+    private readonly hashtagsService: HashtagsService, // private readonly cacheService: CacheService,
   ) {}
   private readonly logger = new Logger(PostsService.name);
 
@@ -254,11 +253,11 @@ export class PostsService {
 
     return posts;
   }
-  async getCached<T>(key: string): Promise<T[] | null> {
-    const cashed: T[] = await this.cacheService.get(key);
+  // async getCached<T>(key: string): Promise<T[] | null> {
+  //   const cashed: T[] = await this.cacheService.get(key);
 
-    return cashed ? cashed : null;
-  }
+  //   return cashed ? cashed : null;
+  // }
 
   async updatePost(dto: UpdatePostDto): Promise<Post> {
     const { title, content } = dto;

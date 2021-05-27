@@ -25,7 +25,7 @@ import { LikeModule } from './like/likes.module';
 import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtag } from './hashtags/entities/hashtag.entity';
 import { PostHashtag } from './posts/entities/post_hashtag.entity';
-import { RedisCacheModule } from './cache/cache.module';
+// import { RedisCacheModule } from './cache/cache.module';
 import { RecommendedPost } from './posts/entities/recommended_post.entity';
 
 @Module({
@@ -76,7 +76,7 @@ import { RecommendedPost } from './posts/entities/recommended_post.entity';
     WingmanModule,
     LikeModule,
     HashtagsModule,
-    RedisCacheModule,
+    // RedisCacheModule,
   ],
   controllers: [
     AppController,

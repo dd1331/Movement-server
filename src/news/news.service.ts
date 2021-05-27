@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateNewsDto } from './dto/update-news.dto';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NewsDto } from './dto/news-dto';
-import { CacheService } from '../cache/cache.service';
+// import { CacheService } from '../cache/cache.service';
 import * as Parser from 'rss-parser';
 import * as dayjs from 'dayjs';
 
 @Injectable()
 export class NewsService {
-  constructor(private cacheService: CacheService) {}
+  // constructor(private cacheService: CacheService) {}
   async findAll(): Promise<NewsDto[]> {
     // const cachedNews: NewsDto[] = await this.cacheService.get('news');
 
@@ -36,9 +35,9 @@ export class NewsService {
   }
 
   async _findAll(): Promise<NewsDto[]> {
-    const cachedNews: NewsDto[] = await this.cacheService.get('news');
+    // const cachedNews: NewsDto[] = await this.cacheService.get('news');
 
-    if (cachedNews) return cachedNews;
+    // if (cachedNews) return cachedNews;
 
     const news: NewsDto[] = [];
     const html = await this.getHtml();
@@ -75,7 +74,7 @@ export class NewsService {
         url,
       };
     });
-    await this.cacheService.set('news', news);
+    // await this.cacheService.set('news', news);
 
     return news;
   }

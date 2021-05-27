@@ -15,7 +15,7 @@ import { CommentsService } from '../comments/comments.service';
 import { HashtagsService } from '../hashtags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from './entities/post_hashtag.entity';
-import { RedisCacheModule } from '../cache/cache.module';
+// import { RedisCacheModule } from '../cache/cache.module';
 import { RecommendedPost } from './entities/recommended_post.entity';
 
 @Module({
@@ -32,9 +32,9 @@ import { RecommendedPost } from './entities/recommended_post.entity';
       PostHashtag,
       RecommendedPost,
     ]),
-    RedisCacheModule,
+    // RedisCacheModule,
   ],
-  exports: [PostsService, RedisCacheModule],
+  exports: [PostsService],
   providers: [
     PostsService,
     UsersService,
