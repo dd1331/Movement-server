@@ -11,9 +11,9 @@ import * as dayjs from 'dayjs';
 export class NewsService {
   constructor(private cacheService: CacheService) {}
   async findAll(): Promise<NewsDto[]> {
-    const cachedNews: NewsDto[] = await this.cacheService.get('news');
+    // const cachedNews: NewsDto[] = await this.cacheService.get('news');
 
-    if (cachedNews) return cachedNews;
+    // if (cachedNews) return cachedNews;
 
     const parser = new Parser();
     const feed = await parser.parseURL(
@@ -30,7 +30,7 @@ export class NewsService {
         url: item.link,
       });
     });
-    await this.cacheService.set('news', news);
+    // await this.cacheService.set('news', news);
 
     return news;
   }

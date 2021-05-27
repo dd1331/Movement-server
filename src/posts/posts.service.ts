@@ -243,6 +243,8 @@ export class PostsService {
     key: string,
     findOptions: FindManyOptions<Post>,
   ): Promise<Post[]> {
+    // MEMO commented out cause of heroku redis issue.
+    // free plan is barely usable
     // const cashedPosts: Post[] = await this.getCached(key);
 
     // if (cashedPosts) return cashedPosts;
