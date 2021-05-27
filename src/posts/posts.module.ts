@@ -16,6 +16,7 @@ import { HashtagsService } from '../hashtags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from './entities/post_hashtag.entity';
 import { RedisCacheModule } from '../cache/cache.module';
+import { RecommendedPost } from './entities/recommended_post.entity';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { RedisCacheModule } from '../cache/cache.module';
       ChildComment,
       Hashtag,
       PostHashtag,
+      RecommendedPost,
     ]),
     RedisCacheModule,
   ],

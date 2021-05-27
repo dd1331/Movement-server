@@ -26,6 +26,7 @@ import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtag } from './hashtags/entities/hashtag.entity';
 import { PostHashtag } from './posts/entities/post_hashtag.entity';
 import { RedisCacheModule } from './cache/cache.module';
+import { RecommendedPost } from './posts/entities/recommended_post.entity';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { RedisCacheModule } from './cache/cache.module';
         ChildComment,
         Hashtag,
         PostHashtag,
+        RecommendedPost,
       ],
       synchronize: true,
       dropSchema: process.env.NODE_ENV === 'test',

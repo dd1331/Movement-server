@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { WingmanService } from './wingman.service';
 import { WingmanController } from './wingman.controller';
-import { PostsService } from '../posts/posts.service';
+// import { PostsService } from '../posts/posts.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -23,7 +23,7 @@ import { FilesService } from '../files/files.service';
   providers: [
     WingmanService,
     UsersService,
-    PostsService,
+    // PostsService,
     HashtagsService,
     FilesService,
   ],

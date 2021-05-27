@@ -24,9 +24,6 @@ export class WingmanService {
   ) {}
   private readonly logger = new Logger(WingmanService.name);
 
-  // @Cron(CronExpression.EVERY_MINUTE)
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  // @Cron(CronExpression.EVERY_30_SECONDS)
   @Cron(CronExpression.EVERY_HOUR)
   async crawlInstizFreeBoard() {
     this.logger.debug(
@@ -121,6 +118,7 @@ export class WingmanService {
         ContentType: 'image/jpeg',
       };
       const { Location, ETag, Key } = await s3.upload(params).promise();
+      fs.unlinkSync(path);
       const uploadFileDto = {
         url: Location,
         eTag: ETag,
@@ -130,7 +128,6 @@ export class WingmanService {
       };
       const file = await this.filesService.createFile(uploadFileDto);
       if (file) {
-        fs.unlinkSync(path);
         createdPost.files = [file];
         await this.postRepo.save(createdPost);
       }

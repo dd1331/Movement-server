@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { Like as TLike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,6 +19,8 @@ import { CacheService } from '../cache/cache.service';
 import { File } from '../files/entities/file.entity';
 import * as dayjs from 'dayjs';
 import { GetPostsDto } from './dto/get-posts.dto';
+import { RecommendedPost } from './entities/recommended_post.entity';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class PostsService {
@@ -25,10 +28,14 @@ export class PostsService {
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
     @InjectRepository(File) private readonly fileRepo: Repository<File>,
-    private usersService: UsersService,
-    private hashtagsService: HashtagsService,
-    private cacheService: CacheService,
+    @InjectRepository(RecommendedPost)
+    private readonly recommendedPost: Repository<RecommendedPost>,
+    private readonly usersService: UsersService,
+    private readonly hashtagsService: HashtagsService,
+    private readonly cacheService: CacheService,
   ) {}
+  private readonly logger = new Logger(PostsService.name);
+
   async createPost(dto: CreatePostDto): Promise<Post> {
     const newPost = await this.postRepo.create(dto);
 
@@ -155,10 +162,10 @@ export class PostsService {
     );
     if (cachedRecommendedPosts) return cachedRecommendedPosts;
 
-    const postIds: number[] = await this.getPostIdsWithImage();
+    const postIds: number[] = await this.getRecommendedPostIds();
     const findOptions: FindManyOptions<Post> = {
       where: { id: In(postIds) },
-      order: { likeCount: 'DESC', createdAt: 'DESC' },
+      order: { likeCount: 'DESC' },
       relations: ['files'],
       take: 6,
     };
@@ -166,10 +173,55 @@ export class PostsService {
     return await this.getCachedOrNormalPosts('recommendedPosts', findOptions);
   }
 
-  private async getPostIdsWithImage(): Promise<number[]> {
+  @Cron(CronExpression.EVERY_HOUR)
+  async setRecommendedPosts(): Promise<void> {
+    // MEMO cron runs twice when this service is provided to other module
+    this.logger.debug(
+      `setRecommendedPosts started ${PostsService.name} ${Date.now()}`,
+    );
+    const postIds: number[] = await this.getPostIdsWithImage();
+    const postsWithImage: Post[] = await this.getPostsWithImage(postIds);
+    await Promise.all(
+      postsWithImage.map(async (post) => {
+        const exist = await this.recommendedPost.findOne({
+          where: { postId: post.id },
+        });
+        if (exist) {
+          exist.updatedAt = dayjs().toDate();
+          await this.recommendedPost.save(exist);
+        } else {
+          const recommendedPost = await this.recommendedPost.create({
+            postId: post.id,
+          });
+          await this.recommendedPost.save(recommendedPost);
+        }
+      }),
+    );
+  }
+  async getPostsWithImage(ids): Promise<Post[]> {
+    return await this.postRepo.find({
+      where: { id: In(ids) },
+      order: { likeCount: 'DESC', createdAt: 'DESC' },
+      take: 6,
+    });
+  }
+  async getRecommendedPostIds(): Promise<number[]> {
+    const posts = await this.recommendedPost.find({
+      order: { updatedAt: 'DESC' },
+      take: 6,
+    });
+    return posts.map((post) => {
+      return post.postId;
+    });
+  }
+
+  async getPostIdsWithImage(): Promise<number[]> {
     const files: File[] = await this.fileRepo.find({
       where: {
-        createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
+        createdAt: Between(
+          dayjs().subtract(10, 'd').toDate(),
+          dayjs().toDate(),
+        ),
       },
     });
     const postIds = files.map((file) => file.postId);
@@ -194,7 +246,6 @@ export class PostsService {
     const cashedPosts: Post[] = await this.getCached(key);
 
     if (cashedPosts) return cashedPosts;
-
     const posts = await this.postRepo.find(findOptions);
 
     await this.cacheService.set(key, posts);
