@@ -13,8 +13,8 @@ export class File extends CommonEntity {
   @Column()
   eTag: string;
 
-  @Column({ name: 'post_id' })
-  postId: number;
+  @Column({ name: 'post_id', nullable: true })
+  postId?: number;
 
   @ManyToOne(() => Post, (post) => post.files)
   @JoinColumn({ name: 'post_id' })

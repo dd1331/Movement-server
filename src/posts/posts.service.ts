@@ -157,10 +157,10 @@ export class PostsService {
     return await this.getCachedOrNormalPosts('popularPosts', findOptions);
   }
   async getRecommendedPosts(): Promise<Post[]> {
-    const cachedRecommendedPosts: Post[] = await this.getCached(
-      'recommendedPosts',
-    );
-    if (cachedRecommendedPosts) return cachedRecommendedPosts;
+    // const cachedRecommendedPosts: Post[] = await this.getCached(
+    //   'recommendedPosts',
+    // );
+    // if (cachedRecommendedPosts) return cachedRecommendedPosts;
 
     const postIds: number[] = await this.getRecommendedPostIds();
     const findOptions: FindManyOptions<Post> = {
@@ -243,12 +243,12 @@ export class PostsService {
     key: string,
     findOptions: FindManyOptions<Post>,
   ): Promise<Post[]> {
-    const cashedPosts: Post[] = await this.getCached(key);
+    // const cashedPosts: Post[] = await this.getCached(key);
 
-    if (cashedPosts) return cashedPosts;
+    // if (cashedPosts) return cashedPosts;
     const posts = await this.postRepo.find(findOptions);
 
-    await this.cacheService.set(key, posts);
+    // await this.cacheService.set(key, posts);
 
     return posts;
   }
