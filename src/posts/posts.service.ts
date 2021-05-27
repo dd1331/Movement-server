@@ -171,9 +171,8 @@ export class PostsService {
       where: {
         createdAt: Between(dayjs().subtract(7, 'd').toDate(), dayjs().toDate()),
       },
-      relations: ['post'],
     });
-    const postIds = files.map((file) => file.post.id);
+    const postIds = files.map((file) => file.postId);
     return postIds;
   }
   async getEmphasizedPosts(dto: GetPostsDto): Promise<Post[]> {

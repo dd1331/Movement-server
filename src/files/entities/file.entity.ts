@@ -1,12 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
 import { CommonEntity } from '../../common.entity';
 
 @Entity()
 export class File extends CommonEntity {
-  // @PrimaryGeneratedColumn()
-  // id: number;
-
   @Column()
   url: string;
 
@@ -16,6 +13,10 @@ export class File extends CommonEntity {
   @Column()
   eTag: string;
 
+  @Column({ name: 'post_id' })
+  postId: number;
+
   @ManyToOne(() => Post, (post) => post.files)
+  @JoinColumn({ name: 'post_id' })
   post: Post;
 }
