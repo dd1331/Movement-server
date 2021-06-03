@@ -166,7 +166,7 @@ export class PostsService {
       where: { id: In(postIds) },
       order: { likeCount: 'DESC' },
       relations: ['files'],
-      take: 6,
+      take: 12,
     };
 
     return await this.getCachedOrNormalPosts('recommendedPosts', findOptions);
@@ -189,9 +189,11 @@ export class PostsService {
           exist.updatedAt = dayjs().toDate();
           await this.recommendedPost.save(exist);
         } else {
-          const recommendedPost = await this.recommendedPost.create({
-            postId: post.id,
-          });
+          const recommendedPost: RecommendedPost = await this.recommendedPost.create(
+            {
+              postId: post.id,
+            },
+          );
           await this.recommendedPost.save(recommendedPost);
         }
       }),
@@ -201,13 +203,13 @@ export class PostsService {
     return await this.postRepo.find({
       where: { id: In(ids) },
       order: { likeCount: 'DESC', createdAt: 'DESC' },
-      take: 6,
+      take: 12,
     });
   }
   async getRecommendedPostIds(): Promise<number[]> {
     const posts = await this.recommendedPost.find({
       order: { updatedAt: 'DESC' },
-      take: 6,
+      take: 12,
     });
     return posts.map((post) => {
       return post.postId;
