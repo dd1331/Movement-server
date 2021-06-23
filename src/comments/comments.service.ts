@@ -20,7 +20,7 @@ export class CommentsService {
     private readonly userService: UsersService,
   ) {}
   async createComment(dto: CreateCommentDto): Promise<Comment> {
-    const post = await this.postsService.getPost(dto.postId);
+    const post = await this.postsService.getPostOrFail(dto.postId);
 
     if (!post) return;
 
@@ -35,7 +35,7 @@ export class CommentsService {
   async createChildComment(dto: CreateChildCommentDto): Promise<ChildComment> {
     const childComment = await this.childCommentRepo.create(dto);
     const parentComment = await this.readComment(dto.parentId);
-    const post = await this.postsService.getPost(dto.postId);
+    const post = await this.postsService.getPostOrFail(dto.postId);
     const commenter = await this.userService.findOne(dto.commenterId);
     parentComment.childCount += 1;
     await this.commentRepo.save(parentComment);

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateHashtagDto } from './dto/update-hashtag.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, getRepository } from 'typeorm';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';

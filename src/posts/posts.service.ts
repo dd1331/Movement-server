@@ -62,7 +62,7 @@ export class PostsService {
 
     return post;
   }
-  async getPost(id: number): Promise<Post> {
+  async getPostOrFail(id: number): Promise<Post> {
     //TODO exclude softdeleted likes
     const post = await this.postRepo.findOne(id, {
       relations: ['poster', 'comments', 'comments.commenter', 'likes', 'files'],
@@ -80,7 +80,7 @@ export class PostsService {
     return post;
   }
   async readPost(id: number): Promise<Post> {
-    const post = await this.getPost(id);
+    const post = await this.getPostOrFail(id);
 
     post.views += 1;
 
@@ -263,7 +263,7 @@ export class PostsService {
 
   async updatePost(dto: UpdatePostDto): Promise<Post> {
     const { title, content } = dto;
-    const existingPost = await this.getPost(dto.id);
+    const existingPost = await this.getPostOrFail(dto.id);
 
     if (!existingPost) return;
 
@@ -277,7 +277,7 @@ export class PostsService {
   }
   async deletePost(postId: number): Promise<Post> {
     // TODO softdelete related comments
-    const post = await this.getPost(postId);
+    const post = await this.getPostOrFail(postId);
 
     if (!post) return;
 
@@ -288,7 +288,7 @@ export class PostsService {
   }
 
   async likeOrDislikePost(dto: CreateLikeDto): Promise<Like[]> {
-    const post = await this.getPost(dto.targetId);
+    const post = await this.getPostOrFail(dto.targetId);
 
     if (!post) return;
 
