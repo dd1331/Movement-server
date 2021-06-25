@@ -342,7 +342,7 @@ export class PostsService {
     return like;
   }
   async createLike(dto: CreateLikeDto, post) {
-    const user = await this.usersService.findOne(dto.userId);
+    const user = await this.usersService.getUserOrFail(dto.userId);
 
     if (dto.isLike) post.likeCount += 1;
     if (!dto.isLike) post.dislikeCount += 1;

@@ -24,7 +24,7 @@ export class CommentsService {
 
     if (!post) return;
 
-    const user = await this.userService.findOne(dto.commenterId);
+    const user = await this.userService.getUserOrFail(dto.commenterId);
     const createdComment = await this.commentRepo.create(dto);
     createdComment.post = post;
     createdComment.commenter = user;
@@ -36,7 +36,7 @@ export class CommentsService {
     const childComment = await this.childCommentRepo.create(dto);
     const parentComment = await this.readComment(dto.parentId);
     const post = await this.postsService.getPostOrFail(dto.postId);
-    const commenter = await this.userService.findOne(dto.commenterId);
+    const commenter = await this.userService.getUserOrFail(dto.commenterId);
     parentComment.childCount += 1;
     await this.commentRepo.save(parentComment);
     childComment.post = post;

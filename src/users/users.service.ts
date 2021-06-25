@@ -67,7 +67,7 @@ export class UsersService {
     return users;
   }
 
-  async findOne(id: number) {
+  async getUserOrFail(id: number) {
     const user: User = await this.userRepo.findOne({
       where: { id },
     });
@@ -102,7 +102,7 @@ export class UsersService {
     return user;
   }
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.getUserOrFail(id);
 
     if (!user) return;
 
