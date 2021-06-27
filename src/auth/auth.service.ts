@@ -51,7 +51,7 @@ export class AuthService {
     return null;
   }
   async login(user: any): Promise<BulkedUser> {
-    const payload = { username: user.username, sub: user.userId };
+    const payload = { id: user.id };
     return { ...user, accessToken: this.jwtService.sign(payload) };
   }
 
