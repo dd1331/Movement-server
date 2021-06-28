@@ -1,27 +1,28 @@
 import { INestApplication, HttpStatus } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
+import each from 'jest-each';
 import { AppModule } from '../../app.module';
 import { UsersService } from '../users.service';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 const newUsers = [
   {
-    id: 0,
+    id: 1,
     userId: 'test id',
     userName: 'test',
     password: '123123',
     phone: '01000000000',
   },
   {
-    id: 1,
+    id: 2,
     userId: 'test id 1',
     userName: 'test1',
     password: '123123',
     phone: '01000000001',
   },
   {
-    id: 2,
+    id: 3,
     userId: 'test id 2',
     userName: 'test2',
     password: '123123',
@@ -32,7 +33,7 @@ const newUsers = [
 describe('Users', () => {
   let app: INestApplication;
   let usersService: UsersService;
-  let createdUser: User;
+  const createdUsers: User[] = [];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -44,12 +45,12 @@ describe('Users', () => {
     usersService = moduleRef.get<UsersService>(UsersService);
     app = moduleRef.createNestApplication();
     await app.init();
-    const uncleared = await request(app.getHttpServer()).get('/users/deleted');
-    await Promise.all(
-      uncleared.body.map(async (user) => {
-        return request(app.getHttpServer()).delete(`/users/delete/${user.id}`);
-      }),
-    );
+    // const uncleared = await request(app.getHttpServer()).get('/users/deleted');
+    // await Promise.all(
+    //   uncleared.body.map(async (user) => {
+    //     return request(app.getHttpServer()).delete(`/users/delete/${user.id}`);
+    //   }),
+    // );
   });
   afterAll(async () => {
     await app.close();
@@ -64,8 +65,8 @@ describe('Users', () => {
     // );
   });
   describe('CREATE', () => {
-    it('/POST signup', async () => {
-      const newUser = newUsers[0];
+    each(newUsers).it('/POST signup', async (newUser) => {
+      // const newUser = newUsers[0];
       const response = await request(app.getHttpServer())
         .post('/users/signup')
         .send(newUser)
@@ -75,7 +76,7 @@ describe('Users', () => {
       expect(userName).toBeTruthy();
       expect(phone).toBe(newUser.phone);
       expect(role).toBe('user');
-      createdUser = response.body;
+      createdUsers.push(response.body);
     });
   });
   describe('READ', () => {
@@ -92,14 +93,14 @@ describe('Users', () => {
       expect(body[0].role).toBeDefined();
     });
     it('/GET user', async () => {
-      const userId = createdUser.id;
+      const userId = createdUsers[0].id;
       const { body } = await request(app.getHttpServer()).get(
         '/users/' + userId,
       );
       expect(body.id).toBe(userId);
-      expect(body.userId).toBe(createdUser.userId);
-      expect(body.userName).toBe(createdUser.userName);
-      expect(body.phone).toBe(createdUser.phone);
+      expect(body.userId).toBe(createdUsers[0].userId);
+      expect(body.userName).toBe(createdUsers[0].userName);
+      expect(body.phone).toBe(createdUsers[0].phone);
     });
     it('/GET user throw an error if user does not exist', async () => {
       const userId = -31;
@@ -118,7 +119,7 @@ describe('Users', () => {
       phone: 'updated phone',
     };
     it('/PUT update user', async () => {
-      const userId = createdUser.id;
+      const userId = createdUsers[0].id;
       const { body } = await request(app.getHttpServer())
         .patch('/users/' + userId)
         .send(updateUserDto);
@@ -130,7 +131,7 @@ describe('Users', () => {
   });
   describe('DELETE', () => {
     it('/DELETE delete user', async () => {
-      const userId = createdUser.id;
+      const userId = createdUsers[createdUsers.length - 1].id;
       const { body } = await request(app.getHttpServer()).delete(
         '/users/' + userId,
       );
@@ -141,13 +142,21 @@ describe('Users', () => {
     });
 
     it('/DELETE throw an error if user does not exist', async () => {
-      const userId = createdUser.id;
+      const userId = 9999;
       const { body } = await request(app.getHttpServer()).delete(
         '/users/' + userId,
       );
       expect(body.statusCode).toBe(HttpStatus.NOT_FOUND);
       expect(body.message).toBe('user not found');
-      return;
+    });
+  });
+  describe('/GET get profile', () => {
+    it('get total posts', async () => {
+      const { body } = await request(app.getHttpServer())
+        .get('/users/profile/' + createdUsers[0].id)
+        .expect(200);
+      expect(body.postSum).toBeDefined();
+      // expect(body.commentSum).toBeDefined();
     });
   });
 });

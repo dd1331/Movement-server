@@ -31,6 +31,10 @@ export class UsersController {
   findOne(@Param('id') id: string) {
     return this.usersService.getUserOrFail(+id);
   }
+  @Get('profile/:id')
+  getProfile(@Param('id') id: string) {
+    return this.usersService.getProfile(+id);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -47,11 +51,11 @@ export class UsersController {
     return this.usersService.hardRemove(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('profile/:id')
-  getProfile(@Request() req) {
-    return req.user;
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get('profile/:id')
+  // getProfile(@Request() req) {
+  //   return req.user;
+  // }
 
   @Get()
   findAll() {

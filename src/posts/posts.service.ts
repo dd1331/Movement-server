@@ -4,6 +4,8 @@ import {
   HttpStatus,
   BadRequestException,
   Logger,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { Like as TLike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,6 +32,8 @@ export class PostsService {
     @InjectRepository(File) private readonly fileRepo: Repository<File>,
     @InjectRepository(RecommendedPost)
     private readonly recommendedPost: Repository<RecommendedPost>,
+    // TODO refactor module structure using req.user
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly hashtagsService: HashtagsService, // private readonly cacheService: CacheService,
   ) {}
@@ -342,6 +346,7 @@ export class PostsService {
     return like;
   }
   async createLike(dto: CreateLikeDto, post) {
+    // TODO replace user to context user
     const user = await this.usersService.getUserOrFail(dto.userId);
 
     if (dto.isLike) post.likeCount += 1;
@@ -354,5 +359,9 @@ export class PostsService {
     await this.likeRepo.save(like);
 
     return like;
+  }
+
+  async getPostSumByUserId(poster: number): Promise<number> {
+    return await this.postRepo.count({ where: { poster } });
   }
 }

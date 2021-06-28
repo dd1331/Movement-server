@@ -1,4 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -6,11 +12,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as randomWords from 'random-words';
 import * as bcript from 'bcrypt';
+import { PostsService } from '../posts/posts.service';
+import { CommentsService } from '../comments/comments.service';
+import { Profile } from './users.type';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @Inject(forwardRef(() => PostsService))
+    private readonly postsService: PostsService, // private readonly commentsService: CommentsService,
   ) {}
   async create(dto: CreateUserDto): Promise<User> {
     await this.checkIfExist(dto);
@@ -75,6 +86,19 @@ export class UsersService {
     if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
     return user;
+  }
+
+  async getProfile(id: number) {
+    // class ProfileDto extends PartialType<User> {}
+    const user: User = await this.getUserOrFail(id);
+    const postSum = await this.postsService.getPostSumByUserId(id);
+    // const commentSum = await this.commentsService.getCommentSumByUserId(id);
+    const profile: Profile = {
+      ...user,
+      postSum,
+      // commentSum,
+    };
+    return profile;
   }
 
   ///temp///
