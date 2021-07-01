@@ -8,6 +8,7 @@ import { PostsService } from '../posts/posts.service';
 import { UsersService } from '../users/users.service';
 import { ChildComment } from './entities/child_comment.entity';
 import { CreateChildCommentDto } from './dto/create-child-comment-dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CommentsService {
@@ -19,12 +20,11 @@ export class CommentsService {
     private readonly postsService: PostsService,
     private readonly userService: UsersService,
   ) {}
-  async createComment(dto: CreateCommentDto): Promise<Comment> {
+  async createComment(dto: CreateCommentDto, user: User): Promise<Comment> {
     const post = await this.postsService.getPostOrFail(dto.postId);
 
     if (!post) return;
 
-    const user = await this.userService.getUserOrFail(dto.commenterId);
     const createdComment = await this.commentRepo.create(dto);
     createdComment.post = post;
     createdComment.commenter = user;

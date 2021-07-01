@@ -9,6 +9,7 @@ import { PostsService } from '../posts/posts.service';
 import { CreateLikeDto } from './dto/create-like-dto';
 import { CommentsService } from '../comments/comments.service';
 import { ChildComment } from '../comments/entities/child_comment.entity';
+import { User } from 'src/users/entities/user.entity';
 
 type LikeTarget = Post | Comment | ChildComment;
 const POST = 'post';
@@ -28,14 +29,14 @@ export class LikesService {
     private postsService: PostsService,
     private commentsService: CommentsService,
   ) {}
-  async likeOrDislike(dto: CreateLikeDto): Promise<Like[]> {
+  async likeOrDislike(dto: CreateLikeDto, user: User): Promise<Like[]> {
     const targetEntity: LikeTarget = await this.getTargetEntity(dto);
 
     if (!targetEntity) return;
 
     const [like] = await this.getLikes(dto, true);
 
-    if (!like) await this.createLike(dto, targetEntity);
+    if (!like) await this.createLike(dto, targetEntity, user);
 
     if (like) await this.updateLikeCount(like, dto, targetEntity);
 
@@ -96,9 +97,7 @@ export class LikesService {
 
     return like;
   }
-  async createLike(dto: CreateLikeDto, target: LikeTarget) {
-    const user = await this.usersService.getUserOrFail(dto.userId);
-
+  async createLike(dto: CreateLikeDto, target: LikeTarget, user: User) {
     if (dto.isLike) target.likeCount += 1;
     if (!dto.isLike) target.dislikeCount += 1;
 

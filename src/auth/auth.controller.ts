@@ -31,13 +31,13 @@ export class AuthController {
     return this.authService.googleLogin(req);
   }
 
-  // @UseGuards(AuthGuard('local'))
-  // @Post('jwt')
-  // async jwtLogin(@Req() req) {
-  //   const user: BulkedUser = await this.authService.login(req.user);
-  //   return user;
-  // }
-
+  @UseGuards(LocalAuthGuard)
+  @HttpCode(200)
+  @Post('jwt')
+  async jwtLogin(@Req() req) {
+    const user: BulkedUser = await this.authService.login(req.user);
+    return user;
+  }
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   @HttpCode(200)

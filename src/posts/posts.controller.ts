@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -16,6 +17,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { LikesService } from '../like/likes.service';
 import { GetPostsDto } from './dto/get-posts.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth-guard';
 
 @Controller('posts')
 export class PostsController {
@@ -69,12 +71,15 @@ export class PostsController {
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
+
+  @UseGuards(JwtAuthGuard)
   @Post('like')
-  likePost(@Body() dto: CreateLikeDto) {
-    return this.likesService.likeOrDislike(dto);
+  likePost(@Body() dto: CreateLikeDto, @Req() req) {
+    return this.likesService.likeOrDislike(dto, req.user);
   }
+  @UseGuards(JwtAuthGuard)
   @Post('dislike')
-  dislikePost(@Body() dto: CreateLikeDto) {
-    return this.likesService.likeOrDislike(dto);
+  dislikePost(@Body() dto: CreateLikeDto, @Req() req) {
+    return this.likesService.likeOrDislike(dto, req.user);
   }
 }
