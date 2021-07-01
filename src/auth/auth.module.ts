@@ -7,14 +7,11 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.strategy';
-import { User } from '../users/entities/user.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { NaverStrategy } from './naver/naver.strategy';
 import { GoogleStrategy } from './google/google.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
     UsersModule,
     PassportModule,
     JwtModule.register({

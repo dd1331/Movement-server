@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from '../posts/entities/post.entity';
 import { Comment } from '../comments/entities/comment.entity';
 import { Repository } from 'typeorm';
-import { UsersService } from '../users/users.service';
 import { PostsService } from '../posts/posts.service';
 import { CreateLikeDto } from './dto/create-like-dto';
 import { CommentsService } from '../comments/comments.service';
@@ -19,13 +18,13 @@ const CHILD_COMMENT = 'childComment';
 @Injectable()
 export class LikesService {
   constructor(
+    // TODO refactor
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
     @InjectRepository(Comment)
     private readonly commentRepo: Repository<Comment>,
     @InjectRepository(ChildComment)
     private readonly childCommentRepo: Repository<ChildComment>,
-    private usersService: UsersService,
     private postsService: PostsService,
     private commentsService: CommentsService,
   ) {}

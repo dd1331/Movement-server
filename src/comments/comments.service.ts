@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment-dto';
 import { UpdateCommentDto } from './dto/update-comment-dto';
 import { PostsService } from '../posts/posts.service';
-import { UsersService } from '../users/users.service';
 import { ChildComment } from './entities/child_comment.entity';
 import { CreateChildCommentDto } from './dto/create-child-comment-dto';
 import { User } from '../users/entities/user.entity';
@@ -18,7 +17,6 @@ export class CommentsService {
     @InjectRepository(ChildComment)
     private readonly childCommentRepo: Repository<ChildComment>,
     private readonly postsService: PostsService,
-    private readonly userService: UsersService,
   ) {}
   async createComment(dto: CreateCommentDto, user: User): Promise<Comment> {
     const post = await this.postsService.getPostOrFail(dto.postId);
@@ -32,11 +30,13 @@ export class CommentsService {
 
     return createdComment;
   }
-  async createChildComment(dto: CreateChildCommentDto): Promise<ChildComment> {
+  async createChildComment(
+    dto: CreateChildCommentDto,
+    commenter: User,
+  ): Promise<ChildComment> {
     const childComment = await this.childCommentRepo.create(dto);
     const parentComment = await this.readComment(dto.parentId);
     const post = await this.postsService.getPostOrFail(dto.postId);
-    const commenter = await this.userService.getUserOrFail(dto.commenterId);
     parentComment.childCount += 1;
     await this.commentRepo.save(parentComment);
     childComment.post = post;
@@ -117,4 +117,14 @@ export class CommentsService {
 
     return comment;
   }
+  // async getCommentSumByUserId(id: number): Promise<number> {
+  //   const parentSum = await this.commentRepo.count({
+  //     where: { commenter: id },
+  //   });
+  //   const childSum = await this.childCommentRepo.count({
+  //     where: { commenter: id },
+  //   });
+
+  //   return parentSum + childSum;
+  // }
 }

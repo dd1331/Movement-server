@@ -4,8 +4,6 @@ import {
   HttpStatus,
   BadRequestException,
   Logger,
-  Inject,
-  forwardRef,
 } from '@nestjs/common';
 import { Like as TLike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,9 +11,6 @@ import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Repository, Between, In, FindManyOptions } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Like } from '../like/entities/like.entity';
-import { CreateLikeDto } from '../like/dto/create-like-dto';
-import { UsersService } from '../users/users.service';
 import { HashtagsService } from '../hashtags/hashtags.service';
 // import { CacheService } from '../cache/cache.service';
 import { File } from '../files/entities/file.entity';
@@ -28,13 +23,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 export class PostsService {
   constructor(
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
-    @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
     @InjectRepository(File) private readonly fileRepo: Repository<File>,
     @InjectRepository(RecommendedPost)
     private readonly recommendedPost: Repository<RecommendedPost>,
-    // TODO refactor module structure using req.user
-    @Inject(forwardRef(() => UsersService))
-    private readonly usersService: UsersService,
     private readonly hashtagsService: HashtagsService, // private readonly cacheService: CacheService,
   ) {}
   private readonly logger = new Logger(PostsService.name);
@@ -291,39 +282,6 @@ export class PostsService {
     return post;
   }
 
-  async updateLikeCount(like: Like, dto: CreateLikeDto, post: Post) {
-    const status: boolean | null = like.isLike;
-    if (status === null && dto.isLike) {
-      post.likeCount += 1;
-      like.isLike = dto.isLike;
-    }
-    if (status === null && !dto.isLike) {
-      post.dislikeCount += 1;
-      like.isLike = dto.isLike;
-    }
-    if (status === true && dto.isLike) {
-      post.likeCount -= 1;
-      like.isLike = null;
-    }
-    if (status === true && !dto.isLike) {
-      post.likeCount -= 1;
-      post.dislikeCount += 1;
-      like.isLike = dto.isLike;
-    }
-    if (status === false && dto.isLike) {
-      post.likeCount += 1;
-      post.dislikeCount -= 1;
-      like.isLike = dto.isLike;
-    }
-    if (status === false && !dto.isLike) {
-      post.dislikeCount -= 1;
-      like.isLike = null;
-    }
-    await this.likeRepo.save(like);
-    await this.postRepo.save(post);
-
-    return like;
-  }
   async getPostSumByUserId(poster: number): Promise<number> {
     return await this.postRepo.count({ where: { poster } });
   }

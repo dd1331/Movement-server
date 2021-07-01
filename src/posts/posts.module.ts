@@ -3,45 +3,23 @@ import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { Post } from './entities/post.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Like } from '../like/entities/like.entity';
-import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
-import { Category } from '../common/entities/category.entity';
 import { File } from '../files/entities/file.entity';
-import { LikesService } from '../like/likes.service';
-import { Comment } from '../comments/entities/comment.entity';
-import { ChildComment } from '../comments/entities/child_comment.entity';
-import { CommentsService } from '../comments/comments.service';
-import { HashtagsService } from '../hashtags/hashtags.service';
-import { Hashtag } from '../hashtags/entities/hashtag.entity';
-import { PostHashtag } from './entities/post_hashtag.entity';
 // import { RedisCacheModule } from '../cache/cache.module';
 import { RecommendedPost } from './entities/recommended_post.entity';
+import { LikeModule } from 'src/like/likes.module';
+import { HashtagsModule } from 'src/hashtags/hashtags.module';
+import { CommentsModule } from 'src/comments/comments.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      User,
-      Post,
-      Like,
-      Category,
-      File,
-      Comment,
-      ChildComment,
-      Hashtag,
-      PostHashtag,
-      RecommendedPost,
-    ]),
+    TypeOrmModule.forFeature([Post, File, RecommendedPost]),
+    LikeModule,
+    HashtagsModule,
+    CommentsModule,
     // RedisCacheModule,
   ],
   exports: [PostsService],
-  providers: [
-    PostsService,
-    UsersService,
-    LikesService,
-    CommentsService,
-    HashtagsService,
-  ],
+  providers: [PostsService],
   controllers: [PostsController],
 })
 export class PostsModule {}

@@ -13,7 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { BulkedUser } from '../users/users.type';
 import { LocalAuthGuard } from './local/local-auth.guard';
-import { LoginDto } from '../aws/dto/login-dto';
+import { LoginDto } from './dto/login-dto';
 import { JwtAuthGuard } from './jwt-auth-guard';
 
 @Controller('auth')
@@ -51,10 +51,9 @@ export class AuthController {
   @Post('naver')
   @Redirect('http://192.168.35.123:3000/auth/naver/redirect')
   async naverLogin(@Body() user: BulkedUser, @Req() req) {
-    console.log('tes');
-    const res = await this.authService.naverLogin(user);
-    req.user = res;
-    return res;
+    // const res = await this.authService.naverLogin(user);
+    // req.user = res;
+    // return res;
   }
 
   @Get('naver/redirect')

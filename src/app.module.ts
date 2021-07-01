@@ -17,7 +17,6 @@ import { Category } from './common/entities/category.entity';
 import { CommonModule } from './common/common.module';
 import { NewsModule } from './news/news.module';
 import { FilesModule } from './files/files.module';
-import { AwsModule } from './aws/aws.module';
 import { File } from './files/entities/file.entity';
 import { WingmanModule } from './wingman/wingman.module';
 import { ChildComment } from './comments/entities/child_comment.entity';
@@ -72,7 +71,6 @@ import { RecommendedPost } from './posts/entities/recommended_post.entity';
     CommonModule,
     NewsModule,
     FilesModule,
-    AwsModule,
     WingmanModule,
     LikeModule,
     HashtagsModule,

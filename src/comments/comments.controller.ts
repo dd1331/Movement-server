@@ -28,9 +28,10 @@ export class CommentsController {
   create(@Body() dto: CreateCommentDto, @Req() req) {
     return this.commentsService.createComment(dto, req.user);
   }
+  @UseGuards(JwtAuthGuard)
   @Post('create-child')
-  createChild(@Body() dto: CreateChildCommentDto) {
-    return this.commentsService.createChildComment(dto);
+  createChild(@Body() dto: CreateChildCommentDto, @Req() req) {
+    return this.commentsService.createChildComment(dto, req.user);
   }
   @Get('fetch-children/:id')
   fetchChildren(@Param('id', ParseIntPipe) id: number) {

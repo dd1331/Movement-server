@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  HttpException,
-  HttpStatus,
-  forwardRef,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -13,15 +7,13 @@ import { Repository } from 'typeorm';
 import * as randomWords from 'random-words';
 import * as bcript from 'bcrypt';
 import { PostsService } from '../posts/posts.service';
-import { CommentsService } from '../comments/comments.service';
 import { Profile } from './users.type';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @Inject(forwardRef(() => PostsService))
-    private readonly postsService: PostsService, // private readonly commentsService: CommentsService,
+    private readonly postsService: PostsService,
   ) {}
   async create(dto: CreateUserDto): Promise<User> {
     await this.checkIfExist(dto);
