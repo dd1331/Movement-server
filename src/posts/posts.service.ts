@@ -291,27 +291,6 @@ export class PostsService {
     return post;
   }
 
-  async likeOrDislikePost(dto: CreateLikeDto): Promise<Like[]> {
-    const post = await this.getPostOrFail(dto.targetId);
-
-    if (!post) return;
-
-    const like = await this.likeRepo.findOne({
-      where: { post: { id: dto.targetId }, user: { id: dto.userId } },
-    });
-
-    if (!like) {
-      await this.createLike(dto, post);
-    }
-    if (like) {
-      await this.updateLikeCount(like, dto, post);
-    }
-
-    const likes = await this.likeRepo.find({
-      where: { post: { id: dto.targetId } },
-    });
-    return likes;
-  }
   async updateLikeCount(like: Like, dto: CreateLikeDto, post: Post) {
     const status: boolean | null = like.isLike;
     if (status === null && dto.isLike) {
@@ -345,22 +324,6 @@ export class PostsService {
 
     return like;
   }
-  async createLike(dto: CreateLikeDto, post) {
-    // TODO replace user to context user
-    const user = await this.usersService.getUserOrFail(dto.userId);
-
-    if (dto.isLike) post.likeCount += 1;
-    if (!dto.isLike) post.dislikeCount += 1;
-
-    await this.postRepo.save(post);
-    const like = await this.likeRepo.create(dto);
-    like.post = post;
-    like.user = user;
-    await this.likeRepo.save(like);
-
-    return like;
-  }
-
   async getPostSumByUserId(poster: number): Promise<number> {
     return await this.postRepo.count({ where: { poster } });
   }
