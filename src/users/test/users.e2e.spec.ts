@@ -6,7 +6,7 @@ import { AppModule } from '../../app.module';
 import { UsersService } from '../users.service';
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
-const newUsers = [
+const newUserParams = [
   {
     id: 1,
     userId: 'test id',
@@ -38,35 +38,16 @@ describe('Users', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      // .overrideProvider(UsersService)
-      // .useValue(usersService)
-      .compile();
+    }).compile();
     usersService = moduleRef.get<UsersService>(UsersService);
     app = moduleRef.createNestApplication();
     await app.init();
-    // const uncleared = await request(app.getHttpServer()).get('/users/deleted');
-    // await Promise.all(
-    //   uncleared.body.map(async (user) => {
-    //     return request(app.getHttpServer()).delete(`/users/delete/${user.id}`);
-    //   }),
-    // );
   });
   afterAll(async () => {
     await app.close();
   });
-  beforeEach(async () => {
-    // const uncleared = await request(app.getHttpServer()).get('/users');
-    // await Promise.all(
-    //   uncleared.body.map(async (user) => {
-    //     console.log(user);
-    //     return request(app.getHttpServer()).delete(`/users/delete/${user.id}`);
-    //   }),
-    // );
-  });
   describe('CREATE', () => {
-    each(newUsers).it('/POST signup', async (newUser) => {
-      // const newUser = newUsers[0];
+    each(newUserParams).it('/POST signup', async (newUser) => {
       const response = await request(app.getHttpServer())
         .post('/users/signup')
         .send(newUser)
@@ -156,7 +137,9 @@ describe('Users', () => {
         .get('/users/profile/' + createdUsers[0].id)
         .expect(200);
       expect(body.postSum).toBeDefined();
-      // expect(body.commentSum).toBeDefined();
+      expect(body.commentSum).toBeDefined();
+      expect(body.likeSum).toBeDefined();
+      expect(body.avatar).toBeDefined();
     });
   });
 });

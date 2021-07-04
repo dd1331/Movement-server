@@ -131,4 +131,8 @@ export class LikesService {
 
     if (dto.type === CHILD_COMMENT) await this.childCommentRepo.save(target);
   }
+
+  async getLikeSumByUserId(id: number) {
+    return await this.likeRepo.count({ where: { id } });
+  }
 }

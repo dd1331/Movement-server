@@ -8,12 +8,16 @@ import * as randomWords from 'random-words';
 import * as bcript from 'bcrypt';
 import { PostsService } from '../posts/posts.service';
 import { Profile } from './users.type';
+import { CommentsService } from '../comments/comments.service';
+import { LikesService } from '../like/likes.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     private readonly postsService: PostsService,
+    private readonly commentsService: CommentsService,
+    private readonly likesService: LikesService,
   ) {}
   async create(dto: CreateUserDto): Promise<User> {
     await this.checkIfExist(dto);
@@ -81,33 +85,17 @@ export class UsersService {
   }
 
   async getProfile(id: number) {
-    // class ProfileDto extends PartialType<User> {}
     const user: User = await this.getUserOrFail(id);
     const postSum = await this.postsService.getPostSumByUserId(id);
-    // const commentSum = await this.commentsService.getCommentSumByUserId(id);
+    const commentSum = await this.commentsService.getCommentSumByUserId(id);
+    const likeSum = await this.likesService.getLikeSumByUserId(id);
     const profile: Profile = {
       ...user,
       postSum,
-      // commentSum,
+      commentSum,
+      likeSum,
     };
     return profile;
-  }
-
-  ///temp///
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
-  async findOneByName(name: string) {
-    return this.users.find((user) => user.username === name);
   }
 
   async getUserByPhone(phone: string) {

@@ -10,6 +10,8 @@ import { RecommendedPost } from '../posts/entities/recommended_post.entity';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
 import { PostsModule } from '../posts/posts.module';
+import { CommentsModule } from '../comments/comments.module';
+import { LikeModule } from '../like/likes.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { PostsModule } from '../posts/posts.module';
       PostHashtag,
     ]),
     PostsModule,
+    CommentsModule,
+    LikeModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

@@ -117,14 +117,14 @@ export class CommentsService {
 
     return comment;
   }
-  // async getCommentSumByUserId(id: number): Promise<number> {
-  //   const parentSum = await this.commentRepo.count({
-  //     where: { commenter: id },
-  //   });
-  //   const childSum = await this.childCommentRepo.count({
-  //     where: { commenter: id },
-  //   });
+  async getCommentSumByUserId(id: number): Promise<number> {
+    const parentSum = await this.commentRepo.count({
+      where: { commenter: id },
+    });
+    const childSum = await this.childCommentRepo.count({
+      where: { commenter: id },
+    });
 
-  //   return parentSum + childSum;
-  // }
+    return parentSum + childSum;
+  }
 }
