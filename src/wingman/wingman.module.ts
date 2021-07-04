@@ -3,8 +3,8 @@ import { WingmanService } from './wingman.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from '../posts/entities/post.entity';
 import { PostsModule } from '../posts/posts.module';
-import { FilesModule } from 'src/files/files.module';
-import { UsersModule } from 'src/users/users.module';
+import { FilesModule } from '../files/files.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [

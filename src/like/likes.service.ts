@@ -8,7 +8,7 @@ import { PostsService } from '../posts/posts.service';
 import { CreateLikeDto } from './dto/create-like-dto';
 import { CommentsService } from '../comments/comments.service';
 import { ChildComment } from '../comments/entities/child_comment.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 
 type LikeTarget = Post | Comment | ChildComment;
 const POST = 'post';

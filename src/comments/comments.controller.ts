@@ -14,7 +14,7 @@ import { CreateCommentDto } from './dto/create-comment-dto';
 import { CreateChildCommentDto } from './dto/create-child-comment-dto';
 import { CreateLikeDto } from '../like/dto/create-like-dto';
 import { LikesService } from '../like/likes.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
+import { JwtAuthGuard } from '../auth/jwt-auth-guard';
 
 @Controller('comments')
 export class CommentsController {

@@ -6,9 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from '../files/entities/file.entity';
 // import { RedisCacheModule } from '../cache/cache.module';
 import { RecommendedPost } from './entities/recommended_post.entity';
-import { LikeModule } from 'src/like/likes.module';
-import { HashtagsModule } from 'src/hashtags/hashtags.module';
-import { CommentsModule } from 'src/comments/comments.module';
+import { LikeModule } from '../like/likes.module';
+import { HashtagsModule } from '../hashtags/hashtags.module';
+import { CommentsModule } from '../comments/comments.module';
 
 @Module({
   imports: [

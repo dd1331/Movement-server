@@ -8,8 +8,7 @@ import { Comment } from '../comments/entities/comment.entity';
 import { ChildComment } from '../comments/entities/child_comment.entity';
 import { LikesService } from './likes.service';
 import { PostsModule } from '../posts/posts.module';
-import { CommentsModule } from 'src/comments/comments.module';
-import { CommentsService } from 'src/comments/comments.service';
+import { CommentsModule } from '../comments/comments.module';
 
 @Module({
   imports: [

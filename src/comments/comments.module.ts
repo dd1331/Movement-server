@@ -5,7 +5,7 @@ import { Comment } from './entities/comment.entity';
 import { CommentsService } from './comments.service';
 import { PostsModule } from '../posts/posts.module';
 import { ChildComment } from './entities/child_comment.entity';
-import { LikeModule } from 'src/like/likes.module';
+import { LikeModule } from '../like/likes.module';
 
 @Module({
   imports: [

@@ -3,15 +3,13 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { PostsService } from '../posts/posts.service';
 import { Post } from '../posts/entities/post.entity';
 import { Like } from '../like/entities/like.entity';
 import { File } from '../files/entities/file.entity';
 import { RecommendedPost } from '../posts/entities/recommended_post.entity';
-import { HashtagsService } from '../hashtags/hashtags.service';
 import { Hashtag } from '../hashtags/entities/hashtag.entity';
 import { PostHashtag } from '../posts/entities/post_hashtag.entity';
-import { PostsModule } from 'src/posts/posts.module';
+import { PostsModule } from '../posts/posts.module';
 
 @Module({
   imports: [
