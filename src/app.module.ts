@@ -26,6 +26,7 @@ import { Hashtag } from './hashtags/entities/hashtag.entity';
 import { PostHashtag } from './posts/entities/post_hashtag.entity';
 // import { RedisCacheModule } from './cache/cache.module';
 import { RecommendedPost } from './posts/entities/recommended_post.entity';
+import { MatcherModule } from './matcher/matcher.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { RecommendedPost } from './posts/entities/recommended_post.entity';
     WingmanModule,
     LikeModule,
     HashtagsModule,
+    MatcherModule,
     // RedisCacheModule,
   ],
   controllers: [

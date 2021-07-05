@@ -124,10 +124,9 @@ describe('Users', () => {
 
     it('/DELETE throw an error if user does not exist', async () => {
       const userId = 9999;
-      const { body } = await request(app.getHttpServer()).delete(
-        '/users/' + userId,
-      );
-      expect(body.statusCode).toBe(HttpStatus.NOT_FOUND);
+      const { body } = await request(app.getHttpServer())
+        .delete('/users/' + userId)
+        .expect(HttpStatus.NOT_FOUND);
       expect(body.message).toBe('user not found');
     });
   });
@@ -135,7 +134,7 @@ describe('Users', () => {
     it('get total posts', async () => {
       const { body } = await request(app.getHttpServer())
         .get('/users/profile/' + createdUsers[0].id)
-        .expect(200);
+        .expect(HttpStatus.OK);
       expect(body.postSum).toBeDefined();
       expect(body.commentSum).toBeDefined();
       expect(body.likeSum).toBeDefined();

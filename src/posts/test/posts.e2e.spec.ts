@@ -121,7 +121,7 @@ describe('Posts', () => {
           userId: user.id,
         };
         if (index < 3) {
-          await likesService.likeOrDislike(createLikeDto);
+          await likesService.likeOrDislike(createLikeDto, user);
         } else {
           await postsService.readPost(post.id);
         }
@@ -165,7 +165,7 @@ describe('Posts', () => {
         targetId: post.id,
         userId: user.id,
       };
-      await likesService.likeOrDislike(createLikeDto);
+      await likesService.likeOrDislike(createLikeDto, user);
     });
     it('create post with hashtags', async () => {
       const dtoWithHashTag: CreatePostDto = {

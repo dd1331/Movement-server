@@ -3,14 +3,12 @@ import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../app.module';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
-import { LoginDto } from '../aws/dto/login-dto';
+import { LoginDto } from '../auth/dto/login-dto';
 
 describe('Auth', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let agent;
-  let createdUser: User;
   let accessToken: string;
 
   beforeAll(async () => {
@@ -18,7 +16,7 @@ describe('Auth', () => {
       imports: [AppModule],
     }).compile();
     usersService = moduleRef.get<UsersService>(UsersService);
-    createdUser = await usersService.create({
+    await usersService.create({
       id: 2,
       userId: 'test id 2',
       userName: 'test2',
@@ -44,10 +42,10 @@ describe('Auth', () => {
       return;
     });
     it('fail to pass jwt guard', async () => {
-      const { body } = await request(agent).get('/auth/test').expect(401);
+      await request(agent).get('/auth/test').expect(401);
     });
     it('succeed to pass jwt guard', async () => {
-      const { body } = await request(agent)
+      await request(agent)
         .get('/auth/test')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
