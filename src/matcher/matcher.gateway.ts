@@ -6,7 +6,7 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { MatcherService } from './matcher.service';
 
 @WebSocketGateway()
@@ -27,20 +27,18 @@ export class MatcherGateway
 
   @SubscribeMessage('match')
   handleMessage(client: any, payload: any) {
-    this.server.to(this.getRoomId(payload)).emit('message', 'ddd');
+    this.server.to(payload.roomId).emit('message', payload.message);
   }
 
   @SubscribeMessage('joinRoom')
-  joinRoom(client: any, payload: any) {
-    const roomId = this.getRoomId(payload);
-    client.join(roomId);
+  async joinRoom(client: any, payload: any) {
+    const { topic } = payload;
+    const room = await this.matcherService.getRoomOrCreate(topic);
+    client.join(room.id.toString());
+    client.emit('join', room);
   }
   @SubscribeMessage('leaveRoom')
   leaveRoom(client: any, payload: any) {
     client.leave(payload.roomId);
-  }
-
-  getRoomId(payload) {
-    return '1';
   }
 }

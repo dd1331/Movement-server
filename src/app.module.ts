@@ -27,6 +27,8 @@ import { PostHashtag } from './posts/entities/post_hashtag.entity';
 // import { RedisCacheModule } from './cache/cache.module';
 import { RecommendedPost } from './posts/entities/recommended_post.entity';
 import { MatcherModule } from './matcher/matcher.module';
+import { RoomLog } from './matcher/room_log.entity';
+import { Room } from './matcher/room.entity';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { MatcherModule } from './matcher/matcher.module';
         Hashtag,
         PostHashtag,
         RecommendedPost,
+        RoomLog,
+        Room,
       ],
       synchronize: true,
       dropSchema: process.env.NODE_ENV === 'test',
