@@ -4,6 +4,7 @@ import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../like/entities/like.entity';
 import { ChildComment } from '../../comments/entities/child_comment.entity';
+import { RoomLog } from '../../matcher/room_log.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -45,4 +46,7 @@ export class User extends CommonEntity {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: [Like];
+
+  @OneToMany(() => RoomLog, (roomLog) => roomLog.user)
+  roomLog: [RoomLog];
 }
