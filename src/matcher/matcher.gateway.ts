@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MatcherService } from './matcher.service';
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway()
 export class MatcherGateway
@@ -26,8 +27,16 @@ export class MatcherGateway
   server: Server;
 
   @SubscribeMessage('match')
-  handleMessage(client: any, payload: any) {
-    this.server.to(payload.roomId).emit('message', payload.message);
+  async handleMessage(client: any, payload: any) {
+    console.log(payload.user);
+    const { userName, avatar, createdAt } = payload.user;
+    const result = {
+      userName,
+      message: payload.message,
+      createdAt,
+      avatar,
+    };
+    this.server.to(payload.roomId).emit('message', result);
   }
 
   @SubscribeMessage('joinRoom')
@@ -35,6 +44,11 @@ export class MatcherGateway
     const { topic } = payload;
     const room = await this.matcherService.getRoomOrCreate(topic);
     client.join(room.id.toString());
+    this.server.to(room.id.toString()).emit('join2', {
+      totalClient: this.server.sockets.adapter.rooms[room.id.toString()].length,
+      user: payload.user,
+      topic,
+    });
     client.emit('join', room);
   }
   @SubscribeMessage('leaveRoom')
