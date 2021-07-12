@@ -29,6 +29,7 @@ import { RecommendedPost } from './posts/entities/recommended_post.entity';
 import { MatcherModule } from './matcher/matcher.module';
 import { RoomLog } from './matcher/room_log.entity';
 import { Room } from './matcher/room.entity';
+import { Chat } from './matcher/chat.entity';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { Room } from './matcher/room.entity';
         RecommendedPost,
         RoomLog,
         Room,
+        Chat,
       ],
       synchronize: true,
       dropSchema: process.env.NODE_ENV === 'test',

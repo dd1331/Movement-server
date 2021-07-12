@@ -1,6 +1,7 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { CommonEntity } from '../common.entity';
 import { RoomLog } from './room_log.entity';
+import { Chat } from './chat.entity';
 
 @Entity()
 export class Room extends CommonEntity {
@@ -9,4 +10,7 @@ export class Room extends CommonEntity {
 
   @Column()
   topic: string;
+
+  @OneToMany(() => Chat, (chat) => chat.room)
+  chat: [Chat];
 }
