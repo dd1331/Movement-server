@@ -8,7 +8,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MatcherService } from './matcher.service';
-import { UsersService } from '../users/users.service';
 
 @WebSocketGateway()
 export class MatcherGateway
@@ -28,7 +27,6 @@ export class MatcherGateway
 
   @SubscribeMessage('match')
   async handleMessage(client: any, payload: any) {
-    console.log(payload.user);
     const { userName, avatar, createdAt } = payload.user;
     const result = {
       userName,
@@ -36,6 +34,11 @@ export class MatcherGateway
       createdAt,
       avatar,
     };
+    await this.matcherService.sendChat({
+      roomId: payload.roomId,
+      user: payload.user,
+      message: payload.message,
+    });
     this.server.to(payload.roomId).emit('message', result);
   }
 
