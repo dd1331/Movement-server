@@ -27,18 +27,19 @@ export class MatcherGateway
 
   @SubscribeMessage('match')
   async handleMessage(client: any, payload: any) {
-    const { userName, avatar, createdAt } = payload.user;
-    const result = {
-      userName,
-      message: payload.message,
-      createdAt,
-      avatar,
-    };
-    await this.matcherService.sendChat({
+    const { userName, avatar } = payload.user;
+    const chat = await this.matcherService.sendChat({
       roomId: payload.roomId,
       user: payload.user,
       message: payload.message,
     });
+    const result = {
+      userName,
+      message: payload.message,
+      createdAt: chat.createdAt,
+      avatar,
+    };
+
     this.server.to(payload.roomId).emit('message', result);
   }
 
@@ -46,11 +47,13 @@ export class MatcherGateway
   async joinRoom(client: any, payload: any) {
     const { topic } = payload;
     const room = await this.matcherService.getRoomOrCreate(topic);
+    const chat = await this.matcherService.getChatByRoomId(room.id);
     client.join(room.id.toString());
     this.server.to(room.id.toString()).emit('join2', {
       totalClient: this.server.sockets.adapter.rooms[room.id.toString()].length,
       user: payload.user,
       topic,
+      chat,
     });
     client.emit('join', room);
   }

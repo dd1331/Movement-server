@@ -9,10 +9,16 @@ export class Chat extends CommonEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ name: 'user_id' })
+  userId: number;
+
   @ManyToOne(() => Room, (room) => room.roomLog, { nullable: false })
   @JoinColumn({ name: 'room_id' })
-  room: Room;
+  roomId: number;
 
   @Column()
   message: string;
+
+  @Column()
+  userName: string;
 }

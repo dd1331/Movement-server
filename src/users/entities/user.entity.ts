@@ -51,6 +51,6 @@ export class User extends CommonEntity {
   @OneToMany(() => RoomLog, (roomLog) => roomLog.user)
   roomLog: [RoomLog];
 
-  @OneToMany(() => Chat, (chat) => chat.user)
+  @OneToMany(() => Chat, (chat) => chat.userId)
   chat: [Chat];
 }

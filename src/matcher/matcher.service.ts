@@ -44,10 +44,21 @@ export class MatcherService {
     room: Room;
   }): Promise<Chat> {
     const { message, user, room } = data;
-    const chat = await this.chatRepo.create({ message });
-    chat.user = user;
-    chat.room = room;
-
+    const chat = await this.chatRepo.create({
+      message,
+      userId: user.id,
+      userName: user.userName,
+      roomId: room.id,
+    });
     return await chat.save();
+  }
+
+  async getChatByRoomId(roomId): Promise<Chat[]> {
+    const chat = await this.chatRepo.find({
+      where: { roomId },
+      take: 50,
+      order: { createdAt: 'DESC' },
+    });
+    return chat;
   }
 }

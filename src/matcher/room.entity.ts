@@ -11,6 +11,6 @@ export class Room extends CommonEntity {
   @Column()
   topic: string;
 
-  @OneToMany(() => Chat, (chat) => chat.room)
+  @OneToMany(() => Chat, (chat) => chat.roomId)
   chat: [Chat];
 }
