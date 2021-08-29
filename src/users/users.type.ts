@@ -2,9 +2,9 @@ import { User } from './entities/user.entity';
 
 export type BulkedUser = Partial<User> & { accessToken: string };
 
-export type Profile = Partial<User> & {
+export type Profile = {
   postSum: number;
   commentSum: number;
   likeSum: number;
-  avatar: string;
+  dislikeSum: number;
 };

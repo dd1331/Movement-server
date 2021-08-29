@@ -63,6 +63,7 @@ export class LikesService {
     target: LikeTarget,
   ): Promise<Like> {
     const status: boolean | null = like.isLike;
+    const { isLike } = dto;
 
     if (status === null && dto.isLike) {
       target.likeCount += 1;
@@ -132,7 +133,10 @@ export class LikesService {
     if (dto.type === CHILD_COMMENT) await this.childCommentRepo.save(target);
   }
 
-  async getLikeSumByUserId(id: number) {
-    return await this.likeRepo.count({ where: { id } });
+  async getLikeSumByUserId(userId: number) {
+    return await this.likeRepo.count({ where: { userId, isLike: true } });
+  }
+  async getDisLikeSumByUserId(userId: number) {
+    return await this.likeRepo.count({ where: { userId, isLike: false } });
   }
 }

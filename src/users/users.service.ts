@@ -74,7 +74,7 @@ export class UsersService {
     return users;
   }
 
-  async getUserOrFail(id: number) {
+  async getUserOrFail(id: number): Promise<User> {
     const user: User = await this.userRepo.findOne({
       where: { id },
     });
@@ -84,16 +84,16 @@ export class UsersService {
     return user;
   }
 
-  async getProfile(id: number) {
-    const user: User = await this.getUserOrFail(id);
+  async getProfile(id: number): Promise<Profile> {
     const postSum = await this.postsService.getPostSumByUserId(id);
     const commentSum = await this.commentsService.getCommentSumByUserId(id);
     const likeSum = await this.likesService.getLikeSumByUserId(id);
+    const dislikeSum = await this.likesService.getDisLikeSumByUserId(id);
     const profile: Profile = {
-      ...user,
       postSum,
       commentSum,
       likeSum,
+      dislikeSum,
     };
     return profile;
   }
